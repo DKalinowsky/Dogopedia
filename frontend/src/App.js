@@ -7,6 +7,7 @@ import SignUp from "./components/SignUp";
 import ContentGrid from "./components/ContentGrid";
 import Footer from "./components/Footer";
 import Login from "./components/Login";
+import MyAccount from "./components/MyAccount";
 import DogDetail from "./components/DogDetail";
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
           <Route path="/dog-breed/:breedName" element={<DogDetail />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/myaccount" element={<MyAccount />} />
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
         </Routes>

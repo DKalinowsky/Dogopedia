@@ -1,7 +1,7 @@
 import React from "react";
-import "./Dashboard.css";
+import "./MyAccount.css";
 
-const Dashboard = ({ isLoggedIn, favoriteBreeds }) => {
+const MyAccount = ({ isLoggedIn, favoriteBreeds }) => {
   return (
     <section className="dashboard">
       <div className="dashboard-container">
@@ -30,7 +30,7 @@ const Dashboard = ({ isLoggedIn, favoriteBreeds }) => {
           <>
             <h2>Access Restricted</h2>
             <p>
-              You need to <a href="/login" className="login-link">log in</a> to access your dashboard.
+              You need to <a href="/login" className="login-link">log in</a> to access your your account.
             </p>
           </>
         )}
@@ -39,4 +39,4 @@ const Dashboard = ({ isLoggedIn, favoriteBreeds }) => {
   );
 };
 
-export default Dashboard;
+export default MyAccount;

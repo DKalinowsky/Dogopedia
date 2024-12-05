@@ -1,30 +1,67 @@
 .dashboard {
-  padding: 60px 20px;
-  background-color: #eaf5fc;
+  background-color: #f4f4f4;
+  padding: 40px 20px;
   text-align: center;
+  font-family: "Arial", sans-serif;
+  color: #333;
 }
 
 .dashboard-container {
-  max-width: 1200px;
-  margin: auto;
+  max-width: 800px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.dashboard h2 {
-  font-size: 2.5rem;
+.dashboard-container h2 {
+  font-size: 28px;
+  color: #0077cc;
   margin-bottom: 20px;
 }
 
-.dashboard p {
-  font-size: 1.2rem;
+.dashboard-container p {
+  font-size: 16px;
   margin-bottom: 20px;
 }
 
-.dashboard-btn {
-  padding: 10px 20px;
-  font-size: 1.2rem;
-  color: white;
-  background-color: #0077cc;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.favorites-list {
+  list-style: none;
+  padding: 0;
+}
+
+.favorite-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f9f9f9;
+  padding: 10px 15px;
+  margin: 10px 0;
+  border-radius: 8px;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.favorite-item h3 {
+  font-size: 18px;
+  margin: 0;
+  color: #333;
+}
+
+.favorite-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.login-link {
+  color: #0077cc;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.login-link:hover {
+  text-decoration: underline;
 }
