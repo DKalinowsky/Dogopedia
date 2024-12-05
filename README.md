@@ -24,3 +24,13 @@ Aby uruchomić projekt lokalnie, wykonaj poniższe kroki:
 - 
 
 ### Krok 1: Klonowanie repozytorium
+git clone https://github.com/DKalinowsky/Dogopedia.git
+
+### Krok 2: Odpal docker compose
+docker compose up --build
+
+### Krok 3: Skonfiguruj bazę danych (Powinno się robić automatycznie przy buildzie, ale nie działa)
+docker exec -it mysql bash
+mysql -u root -p
+root
+SOURCE /docker-entrypoint-initdb.d/init.sql;
