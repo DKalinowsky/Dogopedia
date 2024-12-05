@@ -1,80 +1,78 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./ContentGrid.css";
 import dogBreeds from "./dogBreeds"; // Importujemy dane o rasach
 
 const ContentGrid = () => {
-  // Stan dla filtrów
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [selectedTraits, setSelectedTraits] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortOrder, setSortOrder] = useState('asc'); // Ustawiamy domyślny porządek sortowania
-  const [currentPage, setCurrentPage] = useState(1); // Bieżąca strona
-  const dogsPerPage = 9; // Liczba psów na stronie
-  
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const dogsPerPage = 9;
+
+  const navigate = useNavigate();
+
   // Funkcja obsługująca zmiany w filtrach
   const handleFilterChange = (category, setState, selectedState) => {
     if (selectedState.includes(category)) {
-      setState(selectedState.filter((item) => item !== category)); // Usuwamy kategorię
+      setState(selectedState.filter((item) => item !== category));
     } else {
-      setState([...selectedState, category]); // Dodajemy kategorię
+      setState([...selectedState, category]);
     }
   };
 
-  // Funkcja obsługująca zmianę w polu wyszukiwania
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  // Funkcja obsługująca zmianę porządku sortowania
   const handleSortChange = (event) => {
     setSortOrder(event.target.value);
   };
 
-  // Filtrowanie psów na podstawie wybranych kategorii, rozmiarów, cech i nazwy
+  // Filtrowanie psów
   const filteredDogsList = dogBreeds
     .filter((dog) => {
-      // Filtrujemy na podstawie wybranych kategorii
       const categoryFilter = selectedCategories.length
         ? selectedCategories.includes(dog.category)
         : true;
 
-      // Filtrujemy na podstawie wybranego rozmiaru
       const sizeFilter = selectedSizes.length
         ? selectedSizes.includes(dog.size)
         : true;
 
-      // Filtrujemy na podstawie cech
       const traitsFilter = selectedTraits.length
         ? selectedTraits.every((trait) => dog.traits.includes(trait))
         : true;
 
-      // Filtrujemy na podstawie nazwy psa (wyszukiwanie)
       const nameFilter = dog.name.toLowerCase().includes(searchTerm.toLowerCase());
 
       return categoryFilter && sizeFilter && traitsFilter && nameFilter;
     })
     .sort((a, b) => {
       if (sortOrder === 'asc') {
-        return a.name.localeCompare(b.name); // A-Z
+        return a.name.localeCompare(b.name);
       } else {
-        return b.name.localeCompare(a.name); // Z-A
+        return b.name.localeCompare(a.name);
       }
     });
 
-  // Obliczanie indeksów dla bieżącej strony
   const indexOfLastDog = currentPage * dogsPerPage;
   const indexOfFirstDog = indexOfLastDog - dogsPerPage;
   const currentDogs = filteredDogsList.slice(indexOfFirstDog, indexOfLastDog);
 
-  // Funkcje do zmiany stron
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // Obliczanie liczby stron
   const pageNumbers = [];
   for (let i = 1; i <= Math.ceil(filteredDogsList.length / dogsPerPage); i++) {
     pageNumbers.push(i);
   }
+
+  // Obsługa kliknięcia na kafelek psa
+  const handleCardClick = (breedName) => {
+    navigate(`/dog-breed/${breedName.toLowerCase().replace(/\s+/g, "-")}`);
+  };
 
   return (
     <section className="content-grid">
@@ -143,7 +141,11 @@ const ContentGrid = () => {
       {/* Wyświetlanie psów */}
       <div className="dog-grid">
         {currentDogs.map((dog) => (
-          <div key={dog.id} className="dog-card">
+          <div
+            key={dog.id}
+            className="dog-card"
+            onClick={() => handleCardClick(dog.name)}
+          >
             <img src={dog.imageUrl} alt={dog.name} className="dog-image" />
             <h3 className="dog-name">{dog.name}</h3>
             <p className="dog-description">{dog.description}</p>

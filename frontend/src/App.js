@@ -7,6 +7,7 @@ import SignUp from "./components/SignUp";
 import ContentGrid from "./components/ContentGrid";
 import Footer from "./components/Footer";
 import Login from "./components/Login";
+import DogDetail from "./components/DogDetail";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<ContentGrid />} />
+          <Route path="/dog-breed/:breedName" element={<DogDetail />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/sign-up" element={<SignUp />} />
