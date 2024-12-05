@@ -160,3 +160,29 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+# Node.js
+node_modules/   # Folder z zależnościami npm
+
+# Build directory
+build/           # Folder generowany po budowie aplikacji
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS specific files
+Thumbs.db        # Windows specific file
+
+# IDE settings
+.vscode/          # Folder ustawień Visual Studio Code
+.idea/            # Folder ustawień IntelliJ/PyCharm
+
+# Environment files
+.env              # Pliki środowiskowe (np. klucze API)
+.env.local
+.env.development
+.env.test
+
+# Jest coverage
+coverage/         # Folder generowany przez testy jednostkowe (Jest)
