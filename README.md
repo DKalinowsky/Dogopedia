@@ -13,7 +13,7 @@ Dogopedia to inaczej wikipedia o Psach to społecznościowa platforma internetow
 Projekt został zbudowany przy użyciu:
 - **Frontend**: React.js,
 - **Backend**: Python, Flask
-- **Baza danych**: MySQL
+- **SZBD**: MySQL
 - **Hosting**: 
 - **Inne**: 
 
@@ -21,15 +21,21 @@ Projekt został zbudowany przy użyciu:
 Aby uruchomić projekt lokalnie, wykonaj poniższe kroki:
 
 ### Wymagania wstępne
-- 
+- node.js
 
 ### Krok 1: Klonowanie repozytorium
 git clone https://github.com/DKalinowsky/Dogopedia.git
 
-### Krok 2: Odpal docker compose
+### Krok 2: Zbuduj aplikację REACT
+npx create-react-app frontend
+
+### Krok 3: Postaw serwer lokalny
+npm start
+
+### Krok 4: Odpal docker compose
 docker compose up --build
 
-### Krok 3: Skonfiguruj bazę danych (Powinno się robić automatycznie przy buildzie, ale nie działa)
+### Krok 5: Skonfiguruj bazę danych (Powinno się robić automatycznie przy buildzie, ale nie działa)
 docker exec -it mysql bash
 mysql -u root -p
 root
