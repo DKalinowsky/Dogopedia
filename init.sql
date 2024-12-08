@@ -18,6 +18,8 @@ CREATE TABLE DOGS (
     dog_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     race CHAR(50) NOT NULL,
     size CHAR(50) NOT NULL,
+    category VARCHAR(255),
+    traits TEXT,
     allergies CHAR(255),
     age CHAR(50) NOT NULL,
     description TEXT,
