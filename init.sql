@@ -1,14 +1,9 @@
-CREATE DATABASE IF NOT EXISTS dogopedia;
-CREATE USER 'dog_user'@'%' IDENTIFIED BY 'dog';
-GRANT ALL PRIVILEGES ON dogopedia.* TO 'dog_user'@'%';
-FLUSH PRIVILEGES;
-
 USE dogopedia;
 
 CREATE TABLE USER (
     user_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     customer_nickname CHAR(50) NOT NULL,
-    pass_hash CHAR(50) NOT NULL,
+    pass_hash CHAR(128) NOT NULL,
     email_addr CHAR(50) NOT NULL,
     is_banned BOOLEAN DEFAULT FALSE,
     role ENUM('user', 'admin') NOT NULL

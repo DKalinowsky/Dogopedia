@@ -34,9 +34,3 @@ npm start
 
 ### Krok 4: Odpal docker compose
 docker compose up --build
-
-### Krok 5: Skonfiguruj bazę danych (Powinno się robić automatycznie przy buildzie, ale nie działa)
-docker exec -it mysql bash
-mysql -u root -p
-root
-SOURCE /docker-entrypoint-initdb.d/init.sql;
