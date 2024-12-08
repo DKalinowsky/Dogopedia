@@ -1,148 +1,41 @@
-const dogBreeds = [
-  {
-    id: 1,
-    name: "Labrador Retriever",
-    imageUrl: "labrador.jpg",
-    description: "Friendly, Intelligent, Active",
-    category: "Sporting",
-    size: "Medium",
-    traits: ["Friendly", "Intelligent", "Energetic"]
-  },
-  {
-    id: 2,
-    name: "German Shepherd",
-    imageUrl: "germanshepherd.jpg",
-    description: "Protective, Intelligent, Loyal",
-    category: "Herding",
-    size: "Large",
-    traits: ["Intelligent", "Protective", "Energetic"]
-  },
-  {
-    id: 3,
-    name: "Chihuahua",
-    imageUrl: "chihuahua.jpg",
-    description: "Tiny, Loyal, Alert",
-    category: "Toy",
-    size: "Small",
-    traits: ["Friendly", "Protective"]
-  },
-  {
-    id: 4,
-    name: "Chihuahua",
-    imageUrl: "chihuahua.jpg",
-    description: "Tiny, Loyal, Alert",
-    category: "Toy",
-    size: "Small",
-    traits: ["Friendly", "Protective"]
-  },
-  {
-    id: 5,
-    name: "Chihuahua",
-    imageUrl: "chihuahua.jpg",
-    description: "Tiny, Loyal, Alert",
-    category: "Toy",
-    size: "Small",
-    traits: ["Friendly", "Protective"]
-  },
-  {
-    id: 6,
-    name: "Chihuahua",
-    imageUrl: "chihuahua.jpg",
-    description: "Tiny, Loyal, Alert",
-    category: "Toy",
-    size: "Small",
-    traits: ["Friendly", "Protective"]
-  },
-  {
-    id: 7,
-    name: "Chihuahua",
-    imageUrl: "chihuahua.jpg",
-    description: "Tiny, Loyal, Alert",
-    category: "Toy",
-    size: "Small",
-    traits: ["Friendly", "Protective"]
-  },
-  {
-    id: 8,
-    name: "Chihuahua",
-    imageUrl: "chihuahua.jpg",
-    description: "Tiny, Loyal, Alert",
-    category: "Toy",
-    size: "Small",
-    traits: ["Friendly", "Protective"]
-  },
-  {
-    id: 9,
-    name: "Chihuahua",
-    imageUrl: "chihuahua.jpg",
-    description: "Tiny, Loyal, Alert",
-    category: "Toy",
-    size: "Small",
-    traits: ["Friendly", "Protective"]
-  },
-  {
-    id: 10,
-    name: "Chihuahua",
-    imageUrl: "chihuahua.jpg",
-    description: "Tiny, Loyal, Alert",
-    category: "Toy",
-    size: "Small",
-    traits: ["Friendly", "Protective"]
-  },
-  {
-    id: 11,
-    name: "Chihuahua",
-    imageUrl: "chihuahua.jpg",
-    description: "Tiny, Loyal, Alert",
-    category: "Toy",
-    size: "Small",
-    traits: ["Friendly", "Protective"]
-  },
-  {
-    id: 12,
-    name: "Chihuahua",
-    imageUrl: "chihuahua.jpg",
-    description: "Tiny, Loyal, Alert",
-    category: "Toy",
-    size: "Small",
-    traits: ["Friendly", "Protective"]
-  },
-  {
-    id: 13,
-    name: "Chihuahua",
-    imageUrl: "chihuahua.jpg",
-    description: "Tiny, Loyal, Alert",
-    category: "Toy",
-    size: "Small",
-    traits: ["Friendly", "Protective"]
-  },
-  {
-    id: 14,
-    name: "Chihuahua",
-    imageUrl: "chihuahua.jpg",
-    description: "Tiny, Loyal, Alert",
-    category: "Toy",
-    size: "Small",
-    traits: ["Friendly", "Protective"]
-  },
-  {
-    id: 15,
-    name: "Chihuahua",
-    imageUrl: "chihuahua.jpg",
-    description: "Tiny, Loyal, Alert",
-    category: "Toy",
-    size: "Small",
-    traits: ["Friendly", "Protective"]
-  },
-  {
-    id: 16,
-    name: "Chihuahua",
-    imageUrl: "chihuahua.jpg",
-    description: "Tiny, Loyal, Alert",
-    category: "Toy",
-    size: "Small",
-    traits: ["Friendly", "Protective"]
-  },
-];
+const dogBreeds = [];
 
+// Funkcja do pobierania danych o psach z API
+async function fetchDogs() {
+  try {
+    const response = await fetch('http://localhost:5000/dogs');
+    
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    
+    const dogs = await response.json();
+    console.log('Fetched dogs:', dogs);  // Logowanie pobranych danych
+    
+    // Przekształcenie danych do odpowiedniego formatu
+    dogs.forEach(dog => {
+      const mappedDog = {
+        id: dog.dog_id,  // Zmieniamy dog_id na id
+        name: dog.race,  // Zmieniamy race na name
+        imageUrl: dog.image || 'default-image.jpg',  // Dodajemy domyślny obrazek, jeśli brak
+        description: dog.description,  // Opis
+        category: dog.category || 'Unknown',  // Ustawiamy "Unknown", jeśli brak kategorii
+        size: dog.size || 'Unknown',  // Ustawiamy "Unknown", jeśli brak rozmiaru
+        traits: dog.traits ? dog.traits.split(',') : [],  // Jeśli traits istnieją, przekształcamy je w tablicę
+        activity: dog.activity || 'Unknown',  // Dodajemy domyślną wartość dla activity
+        age: dog.age || 'Unknown',  // Dodajemy domyślną wartość dla wieku
+        cost_range: dog.cost_range || 'Unknown'  // Dodajemy domyślną wartość dla cost_range
+      };
+
+      dogBreeds.push(mappedDog);  // Dodajemy przekształcone dane do tablicy dogBreeds
+    });
+  } catch (error) {
+    console.error('Fetch error:', error);
+  }
+}
+
+// Wywołanie funkcji do pobrania danych
+fetchDogs();
+
+// Eksportowanie tablicy dogBreeds
 export default dogBreeds;
