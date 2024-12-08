@@ -17,7 +17,7 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<ContentGrid />} />
-          <Route path="/dog-breed/:breedName" element={<DogDetail />} />
+          <Route path="/dog-breed/:dogId" element={<DogDetail />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/myaccount" element={<MyAccount />} />

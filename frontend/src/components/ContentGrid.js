@@ -96,9 +96,10 @@ const ContentGrid = () => {
     setSortOrder(event.target.value);
   };
 
-  const handleCardClick = (breedName) => {
-    navigate(`/dog-breed/${breedName.toLowerCase().replace(/\s+/g, "-")}`);
+  const handleCardClick = (dogId) => {
+    navigate(`/dog-breed/${dogId}`); // Przekazujemy dog_id w URL
   };
+  
 
   const pageNumbers = [];
   for (let i = 1; i <= Math.ceil(filteredDogs.length / dogsPerPage); i++) {
@@ -176,24 +177,25 @@ const ContentGrid = () => {
 
       {/* Wyświetlanie psów */}
       <div className="dog-grid">
-        {currentDogs.map((dog) => (
-          <div
-            key={dog.dog_id}
-            className="dog-card"
-            onClick={() => handleCardClick(dog.race)}
-          >
-            <img
-              src={dog.image || "default-image-url"} // Placeholder dla braku obrazu
-              alt={dog.race}
-              className="dog-image"
-            />
-            <h3 className="dog-name">{dog.race}</h3>
-            <p className="dog-description">{dog.description}</p>
-            <p className="dog-category">Category: {dog.category || "Unknown"}</p>
-            <p className="dog-size">Size: {dog.size}</p>
-          </div>
-        ))}
-      </div>
+  {currentDogs.map((dog) => (
+    <div
+      key={dog.dog_id} // Klucz oparty na dog_id
+      className="dog-card"
+      onClick={() => handleCardClick(dog.dog_id)} // Przekazywanie dog_id do funkcji
+    >
+      <img
+        src={dog.image || "default-image-url"} // Placeholder dla braku obrazu
+        alt={dog.race}
+        className="dog-image"
+      />
+      <h3 className="dog-name">{dog.race}</h3>
+      <p className="dog-description">{dog.description}</p>
+      <p className="dog-category">Category: {dog.category || "Unknown"}</p>
+      <p className="dog-size">Size: {dog.size}</p>
+    </div>
+  ))}
+</div>
+
 
       {/* Paginacja */}
       <div className="pagination">

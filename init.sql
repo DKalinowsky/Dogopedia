@@ -59,7 +59,7 @@ INSERT INTO USER (customer_nickname, pass_hash, email_addr, is_banned, role)
 VALUES ('JohnDoe', 'hashedpassword', 'john@example.com', FALSE, 'user');
 
 INSERT INTO DOGS (race, size, category, traits, allergies, age, description, cost_range, activity)
-VALUES ('Golden Retriever', 'Large', 'Sporting', 'Intelligent', 'None', '3 years', 'Friendly and playful', '$$', 'medium');
+VALUES ('Maltipoo', 'Small', 'Toy', 'Intelligent', 'Butter', '12 years', 'Friendly', '$$$$', 'low');
 
 INSERT INTO COMMENTS (user_id, dog_id, comm_text, comm_type)
 VALUES (1, 1, 'Great dog!', 'positive');
