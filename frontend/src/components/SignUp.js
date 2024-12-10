@@ -5,12 +5,10 @@ import "./SignUp.css";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
+    email_addr: '',
     password: '',
     confirmPassword: '',
-    nickname: '',
+    customer_nickname: '',
   });
 
   const [errors, setErrors] = useState({});
@@ -30,10 +28,8 @@ const SignUp = () => {
 
     const validationErrors = {};
 
-    if (!formData.firstName) validationErrors.firstName = 'Imię jest wymagane';
-    if (!formData.lastName) validationErrors.lastName = 'Nazwisko jest wymagane';
-    if (!formData.nickname) validationErrors.nickname = 'Pseudonim jest wymagany';
-    if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) validationErrors.email = 'Podaj poprawny email';
+    if (!formData.customer_nickname) validationErrors.customer_nickname = 'Pseudonim jest wymagany';
+    if (!formData.email_addr || !/\S+@\S+\.\S+/.test(formData.email_addr)) validationErrors.email_addr = 'Podaj poprawny email';
     if (!formData.password) validationErrors.password = 'Hasło jest wymagane';
     if (formData.password !== formData.confirmPassword) validationErrors.confirmPassword = 'Hasła muszą być identyczne';
 
@@ -47,11 +43,9 @@ const SignUp = () => {
 
     try {
       const response = await axios.post('http://localhost:5000/register', {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
+        email_addr: formData.email_addr,
         password: formData.password,
-        nickname: formData.nickname,
+        customer_nickname: formData.customer_nickname,
       });
 
       console.log('Registration successful:', response.data);
@@ -77,29 +71,29 @@ const SignUp = () => {
       <h2>Rejestracja</h2>
       <form onSubmit={handleSubmit} className="signup-form">
         <div className="form-group">
-          <label htmlFor="nickname">Pseudonim</label>
+          <label htmlFor="customer_nickname">Pseudonim</label>
           <input
             type="text"
-            id="nickname"
-            name="nickname"
+            id="customer_nickname"
+            name="customer_nickname"
             value={formData.nickname}
             onChange={handleChange}
             className="form-input"
           />
-          {errors.nickname && <span className="error">{errors.nickname}</span>}
+          {errors.customer_nickname && <span className="error">{errors.customer_nickname}</span>}
         </div>
 
         <div className="form-group">
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email_addr">Email</label>
           <input
             type="email"
-            id="email"
-            name="email"
+            id="email_addr"
+            name="email_addr"
             value={formData.email}
             onChange={handleChange}
             className="form-input"
           />
-          {errors.email && <span className="error">{errors.email}</span>}
+          {errors.email_addr && <span className="error">{errors.email_addr}</span>}
         </div>
 
         <div className="form-group">
