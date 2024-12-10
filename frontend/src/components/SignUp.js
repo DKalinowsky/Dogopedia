@@ -77,32 +77,6 @@ const SignUp = () => {
       <h2>Rejestracja</h2>
       <form onSubmit={handleSubmit} className="signup-form">
         <div className="form-group">
-          <label htmlFor="firstName">Imię</label>
-          <input
-            type="text"
-            id="firstName"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            className="form-input"
-          />
-          {errors.firstName && <span className="error">{errors.firstName}</span>}
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="lastName">Nazwisko</label>
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            className="form-input"
-          />
-          {errors.lastName && <span className="error">{errors.lastName}</span>}
-        </div>
-
-        <div className="form-group">
           <label htmlFor="nickname">Pseudonim</label>
           <input
             type="text"
