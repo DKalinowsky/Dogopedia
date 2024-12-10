@@ -76,7 +76,7 @@ const SignUp = () => {
             type="text"
             id="customer_nickname"
             name="customer_nickname"
-            value={formData.nickname}
+            value={formData.customer_nickname}
             onChange={handleChange}
             className="form-input"
           />
@@ -89,7 +89,7 @@ const SignUp = () => {
             type="email"
             id="email_addr"
             name="email_addr"
-            value={formData.email}
+            value={formData.email_addr}
             onChange={handleChange}
             className="form-input"
           />
