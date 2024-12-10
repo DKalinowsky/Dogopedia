@@ -26,47 +26,42 @@ const SignUp = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const validationErrors = {};
+  const validationErrors = {};
 
-    if (!formData.firstName) validationErrors.firstName = 'Imię jest wymagane';
-    if (!formData.lastName) validationErrors.lastName = 'Nazwisko jest wymagane';
-    if (!formData.nickname) validationErrors.nickname = 'Pseudonim jest wymagany';
-    if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) validationErrors.email = 'Podaj poprawny email';
-    if (!formData.password) validationErrors.password = 'Hasło jest wymagane';
-    if (formData.password !== formData.confirmPassword) validationErrors.confirmPassword = 'Hasła muszą być identyczne';
+  if (!formData.nickname) validationErrors.nickname = 'Pseudonim jest wymagany';
+  if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) validationErrors.email = 'Podaj poprawny email';
+  if (!formData.password) validationErrors.password = 'Hasło jest wymagane';
+  if (formData.password !== formData.confirmPassword) validationErrors.confirmPassword = 'Hasła muszą być identyczne';
 
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors);
+    return;
+  }
+
+  setErrors({});
+  setServerError(null);
+
+  try {
+    const response = await axios.post('http://localhost:5000/register', {
+      customer_nickname: formData.nickname, // Zmiana na oczekiwany klucz
+      email_addr: formData.email, // Zmiana na oczekiwany klucz
+      password: formData.password,
+    });
+
+    console.log('Registration successful:', response.data);
+
+    navigate('/');
+  } catch (error) {
+    if (error.response && error.response.data) {
+      setServerError(error.response.data.error || 'Wystąpił błąd podczas rejestracji');
+    } else {
+      console.error('Error during registration:', error);
+      setServerError('Wystąpił błąd podczas rejestracji. Spróbuj ponownie później.');
     }
-
-    setErrors({});
-    setServerError(null);
-
-    try {
-      const response = await axios.post('http://localhost:5000/register', {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        password: formData.password,
-        nickname: formData.nickname,
-      });
-
-      console.log('Registration successful:', response.data);
-
-      // Przekierowanie po rejestracji
-      navigate('/');
-    } catch (error) {
-      if (error.response && error.response.data) {
-        setServerError(error.response.data.message || 'Wystąpił błąd podczas rejestracji');
-      } else {
-        console.error('Error during registration:', error);
-        setServerError('Wystąpił błąd podczas rejestracji. Spróbuj ponownie później.');
-      }
-    }
-  };
+  }
+};
 
   const handleLoginRedirect = () => {
     navigate('/login');
