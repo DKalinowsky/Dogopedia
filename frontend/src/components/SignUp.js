@@ -1,6 +1,6 @@
-// src/components/SignUp.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import "./SignUp.css";
 
 const SignUp = () => {
@@ -10,9 +10,11 @@ const SignUp = () => {
     email: '',
     password: '',
     confirmPassword: '',
+    nickname: '',
   });
 
   const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState(null);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -23,28 +25,51 @@ const SignUp = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Walidacja formularza
     const validationErrors = {};
 
     if (!formData.firstName) validationErrors.firstName = 'Imię jest wymagane';
     if (!formData.lastName) validationErrors.lastName = 'Nazwisko jest wymagane';
+    if (!formData.nickname) validationErrors.nickname = 'Pseudonim jest wymagany';
     if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) validationErrors.email = 'Podaj poprawny email';
     if (!formData.password) validationErrors.password = 'Hasło jest wymagane';
     if (formData.password !== formData.confirmPassword) validationErrors.confirmPassword = 'Hasła muszą być identyczne';
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-    } else {
-      // Można wysłać dane do backendu tutaj
-      alert('Formularz wysłany!');
+      return;
+    }
+
+    setErrors({});
+    setServerError(null);
+
+    try {
+      const response = await axios.post('http://localhost:5000/register', {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+        nickname: formData.nickname,
+      });
+
+      console.log('Registration successful:', response.data);
+
+      // Przekierowanie po rejestracji
+      navigate('/');
+    } catch (error) {
+      if (error.response && error.response.data) {
+        setServerError(error.response.data.message || 'Wystąpił błąd podczas rejestracji');
+      } else {
+        console.error('Error during registration:', error);
+        setServerError('Wystąpił błąd podczas rejestracji. Spróbuj ponownie później.');
+      }
     }
   };
 
   const handleLoginRedirect = () => {
-    navigate('/login'); // Zmiana na navigate
+    navigate('/login');
   };
 
   return (
@@ -75,6 +100,19 @@ const SignUp = () => {
             className="form-input"
           />
           {errors.lastName && <span className="error">{errors.lastName}</span>}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="nickname">Pseudonim</label>
+          <input
+            type="text"
+            id="nickname"
+            name="nickname"
+            value={formData.nickname}
+            onChange={handleChange}
+            className="form-input"
+          />
+          {errors.nickname && <span className="error">{errors.nickname}</span>}
         </div>
 
         <div className="form-group">
@@ -115,6 +153,8 @@ const SignUp = () => {
           />
           {errors.confirmPassword && <span className="error">{errors.confirmPassword}</span>}
         </div>
+
+        {serverError && <span className="server-error">{serverError}</span>}
 
         <button type="submit" className="submit-button">Zarejestruj się</button>
       </form>

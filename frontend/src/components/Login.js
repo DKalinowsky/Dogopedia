@@ -1,6 +1,6 @@
-// src/components/Login.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import "./Login.css";
 
 const Login = () => {
@@ -10,6 +10,7 @@ const Login = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState(null);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -20,24 +21,49 @@ const Login = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const validationErrors = {};
 
-    if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) validationErrors.email = 'Podaj poprawny email';
-    if (!formData.password) validationErrors.password = 'Hasło jest wymagane';
+    if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) {
+      validationErrors.email = 'Podaj poprawny email';
+    }
+    if (!formData.password) {
+      validationErrors.password = 'Hasło jest wymagane';
+    }
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-    } else {
-      // Można wysłać dane do backendu tutaj
-      alert('Zalogowano!');
+      return;
+    }
+
+    setErrors({});
+    setServerError(null);
+
+    try {
+      const response = await axios.post('http://localhost:5000/login', formData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('Login successful:', response.data);
+
+      // Przekierowanie po zalogowaniu
+      navigate('/');
+    } catch (error) {
+      if (error.response && error.response.data) {
+        setServerError(error.response.data.message || 'Nieprawidłowe dane logowania');
+      } else {
+        console.error('Error during login:', error);
+        setServerError('Wystąpił błąd podczas logowania. Spróbuj ponownie później.');
+      }
     }
   };
 
   const handleSignUpRedirect = () => {
-    navigate('/sign-up'); // Zmiana na navigate
+    navigate('/sign-up');
   };
 
   return (
@@ -69,6 +95,8 @@ const Login = () => {
           />
           {errors.password && <span className="error">{errors.password}</span>}
         </div>
+
+        {serverError && <span className="server-error">{serverError}</span>}
 
         <button type="submit" className="submit-button">Zaloguj się</button>
       </form>
