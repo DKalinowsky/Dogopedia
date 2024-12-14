@@ -160,7 +160,7 @@ def login():
             conn.close()
 
 
-@app.route("/user", methods=["GET"])
+@app.route("/user/info", methods=["GET"])
 @token_required
 def get_user():
     # request.user contains decoded token data
@@ -183,6 +183,111 @@ def get_user():
             cursor.close()
         if conn:
             conn.close()
+
+
+# Endpoint to update user details
+@app.route("/user", methods=["PUT"])
+@token_required
+def update_user():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No input data provided"}), 400
+
+    nickname = data.get('customer_nickname')
+    email = data.get('email_addr')
+
+    if not nickname and not email:
+        return jsonify({"error": "No fields to update"}), 400
+
+    user_id = request.user['user_id']
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Check if the new email already exists
+        if email:
+            cursor.execute("SELECT * FROM USER WHERE email_addr = %s AND user_id != %s", (email, user_id))
+            if cursor.fetchone():
+                return jsonify({"error": "Email already exists"}), 400
+
+        # Perform updates
+        if nickname:
+            cursor.execute("UPDATE USER SET customer_nickname = %s WHERE user_id = %s", (nickname, user_id))
+        if email:
+            cursor.execute("UPDATE USER SET email_addr = %s WHERE user_id = %s", (email, user_id))
+        conn.commit()
+        return jsonify({"message": "User updated successfully"}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+# Endpoint to delete a user
+@app.route("/user", methods=["DELETE"])
+@token_required
+def delete_user():
+    user_id = request.user['user_id']
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM USER WHERE user_id = %s", (user_id,))
+        conn.commit()
+        return jsonify({"message": "User deleted successfully"}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+
+@app.route("/user/update-password", methods=["PUT"])
+@token_required
+def update_password():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No input data provided"}), 400
+
+    current_password = data.get('current_password')
+    new_password = data.get('new_password')
+
+    if not current_password or not new_password:
+        return jsonify({"error": "Both current and new passwords are required"}), 400
+
+    user_id = request.user['user_id']
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT pass_hash FROM USER WHERE user_id = %s", (user_id,))
+        user = cursor.fetchone()
+
+        if user and hash_password(current_password) == user['pass_hash']:
+            new_hashed_pass = hash_password(new_password)
+            cursor.execute("UPDATE USER SET pass_hash = %s WHERE user_id = %s", (new_hashed_pass, user_id))
+            conn.commit()
+            return jsonify({"message": "Password updated successfully"}), 200
+        else:
+            return jsonify({"error": "Current password is incorrect"}), 401
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+
+
 @app.route("/protected", methods=["GET"])
 @token_required
 def protected():

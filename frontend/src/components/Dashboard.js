@@ -13,7 +13,7 @@ const Dashboard = ({ favoriteBreeds }) => {
     if (isLoggedIn) {
       const fetchUserData = async () => {
         try {
-          const response = await axios.get("http://localhost:5000/user", {
+          const response = await axios.get("http://localhost:5000/user/info", {
             params: { user_id: user.user_id },
           });
           setUserData(response.data);
