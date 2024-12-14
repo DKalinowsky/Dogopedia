@@ -2,16 +2,18 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import "./Login.css";
+import { useAuth } from './AuthProvider';
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    email: '',
+    email_addr: '',
     password: '',
   });
 
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState(null);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,8 +28,8 @@ const Login = () => {
 
     const validationErrors = {};
 
-    if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) {
-      validationErrors.email = 'Podaj poprawny email';
+    if (!formData.email_addr || !/\S+@\S+\.\S+/.test(formData.email_addr)) {
+      validationErrors.email_addr = 'Podaj poprawny email';
     }
     if (!formData.password) {
       validationErrors.password = 'Hasło jest wymagane';
@@ -50,6 +52,9 @@ const Login = () => {
 
       console.log('Login successful:', response.data);
 
+      const { token } = response.data;
+      login(token);
+
       // Przekierowanie po zalogowaniu
       navigate('/');
     } catch (error) {
@@ -71,16 +76,16 @@ const Login = () => {
       <h2>Logowanie</h2>
       <form onSubmit={handleSubmit} className="login-form">
         <div className="form-group">
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email_addr">Email</label>
           <input
             type="email"
-            id="email"
-            name="email"
-            value={formData.email}
+            id="email_addr"
+            name="email_addr"
+            value={formData.email_addr}
             onChange={handleChange}
             className="form-input"
           />
-          {errors.email && <span className="error">{errors.email}</span>}
+          {errors.email_addr && <span className="error">{errors.email_addr}</span>}
         </div>
 
         <div className="form-group">

@@ -159,6 +159,30 @@ def login():
         if conn:
             conn.close()
 
+
+@app.route("/user", methods=["GET"])
+@token_required
+def get_user():
+    # request.user contains decoded token data
+    user_id = request.user['user_id']
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT user_id, customer_nickname, role, email_addr FROM USER WHERE user_id = %s", (user_id,))
+        user = cursor.fetchone()
+        if user:
+            return jsonify(user), 200
+        else:
+            return jsonify({"error": "User not found"}), 404
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 @app.route("/protected", methods=["GET"])
 @token_required
 def protected():
