@@ -287,6 +287,82 @@ def update_password():
             conn.close()
 
 
+@app.route("/user/favorites/add", methods=["POST"])
+@token_required
+def add_favorite_dog():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No input data provided"}), 400
+
+    dog_id = data.get('dog_id')
+    user_id = request.user['user_id']
+
+    if not dog_id:
+        return jsonify({"error": "Dog ID is required"}), 400
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Check if the dog is already liked
+        cursor.execute("SELECT * FROM LIKED WHERE user_id = %s AND dog_id = %s", (user_id, dog_id))
+        existing_like = cursor.fetchone()
+        if existing_like:
+            return jsonify({"error": "Dog is already in favorites"}), 400
+
+        # Add the dog to favorites
+        cursor.execute("INSERT INTO LIKED (user_id, dog_id) VALUES (%s, %s)", (user_id, dog_id))
+        conn.commit()
+
+        return jsonify({"message": "Dog added to favorites successfully"}), 201
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+@app.route("/user/favorites/remove", methods=["DELETE"])
+@token_required
+def remove_favorite_dog():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No input data provided"}), 400
+
+    dog_id = data.get('dog_id')
+    user_id = request.user['user_id']
+
+    if not dog_id:
+        return jsonify({"error": "Dog ID is required"}), 400
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Check if the dog is in favorites
+        cursor.execute("SELECT * FROM LIKED WHERE user_id = %s AND dog_id = %s", (user_id, dog_id))
+        existing_like = cursor.fetchone()
+        if not existing_like:
+            return jsonify({"error": "Dog is not in favorites"}), 404
+
+        # Remove the dog from favorites
+        cursor.execute("DELETE FROM LIKED WHERE user_id = %s AND dog_id = %s", (user_id, dog_id))
+        conn.commit()
+
+        return jsonify({"message": "Dog removed from favorites successfully"}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 
 @app.route("/protected", methods=["GET"])
 @token_required
