@@ -3,7 +3,7 @@ USE dogopedia;
 CREATE TABLE USER (
     user_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     customer_nickname CHAR(50) NOT NULL,
-    pass_hash CHAR(128) NOT NULL,
+    pass_hash CHAR(256) NOT NULL,
     email_addr CHAR(50) NOT NULL,
     is_banned BOOLEAN DEFAULT FALSE,
     role ENUM('user', 'admin') NOT NULL
