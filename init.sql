@@ -51,7 +51,7 @@ CREATE TABLE REPORTS (
 
 -- Insert example data
 INSERT INTO USER (customer_nickname, pass_hash, email_addr, is_banned, role)
-VALUES ('JohnDoe', 'hashedpassword', 'john@example.com', FALSE, 'user');
+VALUES ('Administrator', 'abe31fe1a2113e7e8bf174164515802806d388cf4f394cceace7341a182271ab', 'admin@dogopedia.com', FALSE, 'admin');
 
 INSERT INTO DOGS (race, size, category, traits, allergies, age, description, cost_range, activity)
 VALUES ('Maltipoo', 'Small', 'Toy', 'Intelligent', 'Butter', '12 years', 'Friendly', '$$$$', 'low');

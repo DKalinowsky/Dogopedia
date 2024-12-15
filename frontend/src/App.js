@@ -9,6 +9,7 @@ import Footer from "./components/Footer";
 import Login from "./components/Login";
 import MyAccount from "./components/MyAccount";
 import DogDetail from "./components/DogDetail";
+import ManageUsers from "./components/ManageUsers";
 import { AuthProvider } from "./components/AuthProvider";
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
             <Route path="/myaccount" element={<MyAccount />} />
             <Route path="/sign-up" element={<SignUp />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/manage-users" element={<ManageUsers />} />
           </Routes>
           <Footer />
         </div>
