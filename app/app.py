@@ -237,9 +237,10 @@ def delete_user():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
+        cursor.execute("DELETE FROM LIKED WHERE user_id = %s", (user_id,))
         cursor.execute("DELETE FROM USER WHERE user_id = %s", (user_id,))
         conn.commit()
-        return jsonify({"message": "User deleted successfully"}), 200
+        return jsonify({"message": "User and associated liked entries deleted successfully"}), 200
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
     finally:
@@ -363,6 +364,66 @@ def remove_favorite_dog():
         if conn:
             conn.close()
 
+# New endpoint: Admin ban user
+@app.route("/user/<int:user_id>/ban", methods=["PATCH"])
+@token_required
+def ban_user(user_id):
+    # Check if the currently logged-in user is admin
+    if request.user['role'] != 'admin':
+        return jsonify({"error": "Forbidden"}), 403
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        # Set is_banned to True
+        cursor.execute("UPDATE USER SET is_banned = TRUE WHERE user_id = %s", (user_id,))
+        conn.commit()
+
+        # Check if any row was actually updated
+        if cursor.rowcount == 0:
+            return jsonify({"error": "User not found"}), 404
+
+        return jsonify({"message": "User banned successfully"}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+# New endpoint: Admin delete user
+@app.route("/user/<int:user_id>", methods=["DELETE"])
+@token_required
+def admin_delete_user(user_id):
+    # Check if the currently logged-in user is admin
+    if request.user['role'] != 'admin':
+        return jsonify({"error": "Forbidden"}), 403
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        # First delete from LIKED table
+        cursor.execute("DELETE FROM LIKED WHERE user_id = %s", (user_id,))
+        # Then delete the user
+        cursor.execute("DELETE FROM USER WHERE user_id = %s", (user_id,))
+        conn.commit()
+
+        if cursor.rowcount == 0:
+            return jsonify({"error": "User not found"}), 404
+
+        return jsonify({"message": "User and associated liked entries deleted by admin successfully"}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 @app.route("/protected", methods=["GET"])
 @token_required
