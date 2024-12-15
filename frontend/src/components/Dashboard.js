@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "./AuthProvider"; // Kontekst autoryzacji
+import { useNavigate } from "react-router-dom"; // Import useNavigate do przekierowywania
 import { Link } from "react-router-dom"; // Import Link z react-router-dom
 import "./Dashboard.css";
 
@@ -24,6 +25,11 @@ const Dashboard = () => {
   const [likedDogs, setLikedDogs] = useState([]); // Przechowywanie ulubionych psów
   const [loading, setLoading] = useState(true); // Status ładowania
   const [error, setError] = useState(null); // Obsługa błędów
+  const navigate = useNavigate(); // Hook nawigacji
+
+  const handleCardClick = (dogId) => {
+    navigate(`/dog-breed/${dogId}`); // Przekazujemy dog_id w URL
+  };
 
   // Pobieranie psów i ulubionych psów po zalogowaniu
   useEffect(() => {
@@ -88,25 +94,27 @@ const Dashboard = () => {
         <ul className="favorites-list">
           {likedDogs.length > 0 ? (
             likedDogs.map((dog) => (
-              <li key={dog.id} className="favorite-item">
-                <h3>
-                  {/* Pogrubiona nazwa rasy psa jako link */}
-                  <Link to={`/dog-breed/${dog.id}`} className="dog-breed-link">
-                    {dog.name}
-                  </Link>
-                </h3>
-                <img
-                  src={dog.imageUrl}
-                  alt={dog.name}
-                  className="favorite-image"
-                />
-                <p>{dog.description}</p>
-                <p>Category: {dog.category}</p>
-                <p>Size: {dog.size}</p>
-                <p>Traits: {dog.traits.join(", ") || "None"}</p>
-                <p>Activity Level: {dog.activity}</p>
-                <p>Age: {dog.age}</p>
-                <p>Cost Range: {dog.cost_range}</p>
+              <li key={dog.id} className="favorite-item" onClick={() => handleCardClick(dog.id)}>
+                <div className="favorite-item-left">
+                  <img
+                    src={dog.imageUrl}
+                    alt={dog.name}
+                    className="favorite-image"
+                    onClick={() => handleCardClick(dog.id)} // Kliknięcie obrazu psa przekierowuje do szczegółów
+                  />
+                  <div className="favorite-info">
+                    <h3>
+                        {dog.name}
+                    </h3>
+                    <p>{dog.description}</p>
+                    <p><strong>Category:</strong> {dog.category}</p>
+                    <p><strong>Size:</strong> {dog.size}</p>
+                    <p><strong>Traits:</strong> {dog.traits.join(", ") || "None"}</p>
+                    <p><strong>Activity Level:</strong> {dog.activity}</p>
+                    <p><strong>Age:</strong> {dog.age}</p>
+                    <p><strong>Cost Range:</strong> {dog.cost_range}</p>
+                  </div>
+                </div>
               </li>
             ))
           ) : (
