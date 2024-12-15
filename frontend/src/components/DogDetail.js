@@ -12,8 +12,9 @@ const DogDetail = () => {
   const [favoriteError, setFavoriteError] = useState(null); // Obsługa błędu ulubionych
 
   useEffect(() => {
-    const fetchBreed = async () => {
+    const fetchBreedAndFavorites = async () => {
       try {
+        // Pobierz szczegóły psa
         const response = await axios.get("http://localhost:5000/dogs");
         const data = response.data;
 
@@ -30,6 +31,14 @@ const DogDetail = () => {
         }
 
         setBreed(foundBreed);
+
+        // Sprawdź, czy pies jest w ulubionych
+        const favoritesResponse = await axios.get("http://localhost:5000/liked");
+        const favoriteDogs = favoritesResponse.data;
+
+        // Jeśli `dogId` jest na liście ulubionych, ustaw `isFavorite` na true
+        const isFavoriteDog = favoriteDogs.some((favorite) => favorite.dog_id === foundBreed.dog_id);
+        setIsFavorite(isFavoriteDog);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -37,23 +46,29 @@ const DogDetail = () => {
       }
     };
 
-    fetchBreed();
+    fetchBreedAndFavorites();
   }, [dogId]);
 
   const handleFavoriteClick = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/user/favorites/add", {
-        dog_id: breed.dog_id, // Identyfikator psa
-      });
-
-      // Zakładając, że sukces to zmiana stanu serduszka
-      if (response.status === 200 || response.status === 201) {
+      if (isFavorite) {
+        // Usuń z ulubionych
+        await axios.delete("http://localhost:5000/user/favorites/remove", {
+          data: { dog_id: breed.dog_id }, // Poprawka tutaj
+        });
+        setIsFavorite(false);
+      } else {
+        // Dodaj do ulubionych
+        await axios.post("http://localhost:5000/user/favorites/add", {
+          dog_id: breed.dog_id,
+        });
         setIsFavorite(true);
       }
     } catch (err) {
-      setFavoriteError(err.response?.data?.error || "Error adding to favorites");
+      setFavoriteError(err.response?.data?.error || "Error updating favorites");
     }
   };
+  
 
   if (loading) {
     return <h2>Loading...</h2>;
@@ -74,7 +89,7 @@ const DogDetail = () => {
         <button
           className={`favorite-button ${isFavorite ? "favorite" : ""}`}
           onClick={handleFavoriteClick}
-          title={isFavorite ? "Added to favorites" : "Add to favorites"}
+          title={isFavorite ? "Remove from favorites" : "Add to favorites"}
         >
           {isFavorite ? "❤️" : "🤍"}
         </button>
