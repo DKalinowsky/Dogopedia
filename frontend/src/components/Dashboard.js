@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "./AuthProvider"; // Kontekst autoryzacji
+import { Link } from "react-router-dom"; // Import Link z react-router-dom
 import "./Dashboard.css";
 
 // Funkcja mapująca dane psów
@@ -88,7 +89,12 @@ const Dashboard = () => {
           {likedDogs.length > 0 ? (
             likedDogs.map((dog) => (
               <li key={dog.id} className="favorite-item">
-                <h3>{dog.name}</h3>
+                <h3>
+                  {/* Pogrubiona nazwa rasy psa jako link */}
+                  <Link to={`/dog-breed/${dog.id}`} className="dog-breed-link">
+                    {dog.name}
+                  </Link>
+                </h3>
                 <img
                   src={dog.imageUrl}
                   alt={dog.name}
