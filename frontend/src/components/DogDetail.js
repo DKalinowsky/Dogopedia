@@ -7,6 +7,8 @@ const DogDetail = () => {
   const [breed, setBreed] = useState(null); // Przechowywanie danych o rasie
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isFavorite, setIsFavorite] = useState(false); // Stan ulubionego psa
+  const [favoriteError, setFavoriteError] = useState(null); // Obsługa błędu ulubionych
 
   useEffect(() => {
     const fetchBreed = async () => {
@@ -40,6 +42,29 @@ const DogDetail = () => {
     fetchBreed();
   }, [dogId]);
 
+  const handleFavoriteClick = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/user/favorites/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          dog_id: breed.dog_id, // Identyfikator psa
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error adding to favorites: ${response.statusText}`);
+      }
+
+      // Zakładając, że sukces to zmiana stanu serduszka
+      setIsFavorite(true);
+    } catch (err) {
+      setFavoriteError(err.message);
+    }
+  };
+
   if (loading) {
     return <h2>Loading...</h2>;
   }
@@ -50,11 +75,20 @@ const DogDetail = () => {
 
   return (
     <div className="dog-detail">
-      <img
-        src={breed.image || "default-image-url"} // Placeholder dla braku obrazu
-        alt={breed.race}
-        className="dog-detail-image"
-      />
+      <div className="dog-detail-header">
+        <img
+          src={breed.image || "default-image-url"} // Placeholder dla braku obrazu
+          alt={breed.race}
+          className="dog-detail-image"
+        />
+        <button
+          className={`favorite-button ${isFavorite ? "favorite" : ""}`}
+          onClick={handleFavoriteClick}
+          title={isFavorite ? "Added to favorites" : "Add to favorites"}
+        >
+          {isFavorite ? "❤️" : "🤍"}
+        </button>
+      </div>
       <h1 className="dog-detail-name">{breed.race}</h1>
       <p className="dog-detail-description">{breed.description}</p>
       <ul className="dog-detail-info">
@@ -66,6 +100,7 @@ const DogDetail = () => {
         <li>Allergies: {breed.allergies || "None"}</li>
         <li>Cost Range: {breed.cost_range || "Unknown"}</li>
       </ul>
+      {favoriteError && <p className="error">Error: {favoriteError}</p>}
     </div>
   );
 };
