@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import axios from "axios";
 import "./DogDetail.css";
 
 const DogDetail = () => {
@@ -13,11 +14,8 @@ const DogDetail = () => {
   useEffect(() => {
     const fetchBreed = async () => {
       try {
-        const response = await fetch("http://localhost:5000/dogs");
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
+        const response = await axios.get("http://localhost:5000/dogs");
+        const data = response.data;
 
         // Znajdź psa na podstawie dog_id
         const foundBreed = data.find((dog) => dog.dog_id === parseInt(dogId));
@@ -44,24 +42,16 @@ const DogDetail = () => {
 
   const handleFavoriteClick = async () => {
     try {
-      const response = await fetch("http://localhost:5000/user/favorites/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          dog_id: breed.dog_id, // Identyfikator psa
-        }),
+      const response = await axios.post("http://localhost:5000/user/favorites/add", {
+        dog_id: breed.dog_id, // Identyfikator psa
       });
 
-      if (!response.ok) {
-        throw new Error(`Error adding to favorites: ${response.statusText}`);
-      }
-
       // Zakładając, że sukces to zmiana stanu serduszka
-      setIsFavorite(true);
+      if (response.status === 200 || response.status === 201) {
+        setIsFavorite(true);
+      }
     } catch (err) {
-      setFavoriteError(err.message);
+      setFavoriteError(err.response?.data?.error || "Error adding to favorites");
     }
   };
 
