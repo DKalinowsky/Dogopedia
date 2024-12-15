@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify'; // Import `toast` i `ToastContainer`
+import 'react-toastify/dist/ReactToastify.css'; // Import CSS dla `react-toastify`
 import "./Login.css";
 import { useAuth } from './AuthProvider';
 
@@ -55,14 +57,21 @@ const Login = () => {
       const { token } = response.data;
       login(token);
 
+      // Powiadomienie o sukcesie logowania
+      toast.success('Zalogowano pomyślnie!');
+
       // Przekierowanie po zalogowaniu
       navigate('/');
     } catch (error) {
       if (error.response && error.response.data) {
         setServerError(error.response.data.message || 'Nieprawidłowe dane logowania');
+        // Powiadomienie o błędzie logowania
+        toast.error(error.response.data.message || 'Nieprawidłowe dane logowania');
       } else {
         console.error('Error during login:', error);
         setServerError('Wystąpił błąd podczas logowania. Spróbuj ponownie później.');
+        // Powiadomienie o ogólnym błędzie logowania
+        toast.error('Wystąpił błąd podczas logowania. Spróbuj ponownie później.');
       }
     }
   };
@@ -109,6 +118,9 @@ const Login = () => {
       <p>
         Nie masz konta? <span onClick={handleSignUpRedirect} className="signup-link">Zarejestruj się</span>
       </p>
+
+      {/* Dodanie ToastContainer w komponencie */}
+      <ToastContainer />
     </div>
   );
 };

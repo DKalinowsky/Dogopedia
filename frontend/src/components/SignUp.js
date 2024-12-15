@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import "./SignUp.css";
+import { toast, ToastContainer } from 'react-toastify'; // Import `toast` i `ToastContainer`
+import 'react-toastify/dist/ReactToastify.css'; // Import CSS dla `react-toastify`
+import './SignUp.css';
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -26,42 +28,50 @@ const SignUp = () => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const validationErrors = {};
+    const validationErrors = {};
 
-  if (!formData.nickname) validationErrors.nickname = 'Pseudonim jest wymagany';
-  if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) validationErrors.email = 'Podaj poprawny email';
-  if (!formData.password) validationErrors.password = 'Hasło jest wymagane';
-  if (formData.password !== formData.confirmPassword) validationErrors.confirmPassword = 'Hasła muszą być identyczne';
+    if (!formData.nickname) validationErrors.nickname = 'Pseudonim jest wymagany';
+    if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) validationErrors.email = 'Podaj poprawny email';
+    if (!formData.password) validationErrors.password = 'Hasło jest wymagane';
+    if (formData.password !== formData.confirmPassword) validationErrors.confirmPassword = 'Hasła muszą być identyczne';
 
-  if (Object.keys(validationErrors).length > 0) {
-    setErrors(validationErrors);
-    return;
-  }
-
-  setErrors({});
-  setServerError(null);
-
-  try {
-    const response = await axios.post('http://localhost:5000/register', {
-      customer_nickname: formData.nickname, // Zmiana na oczekiwany klucz
-      email_addr: formData.email, // Zmiana na oczekiwany klucz
-      password: formData.password,
-    });
-
-    console.log('Registration successful:', response.data);
-
-    navigate('/');
-  } catch (error) {
-    if (error.response && error.response.data) {
-      setServerError(error.response.data.error || 'Wystąpił błąd podczas rejestracji');
-    } else {
-      console.error('Error during registration:', error);
-      setServerError('Wystąpił błąd podczas rejestracji. Spróbuj ponownie później.');
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
     }
-  }
-};
+
+    setErrors({});
+    setServerError(null);
+
+    try {
+      const response = await axios.post('http://localhost:5000/register', {
+        customer_nickname: formData.nickname, // Zmiana na oczekiwany klucz
+        email_addr: formData.email, // Zmiana na oczekiwany klucz
+        password: formData.password,
+      });
+
+      console.log('Registration successful:', response.data);
+
+      // Powiadomienie o sukcesie rejestracji
+      toast.success('Rejestracja zakończona sukcesem! Zaloguj się teraz.');
+
+      // Przekierowanie po rejestracji
+      navigate('/');
+    } catch (error) {
+      if (error.response && error.response.data) {
+        setServerError(error.response.data.error || 'Wystąpił błąd podczas rejestracji');
+        // Powiadomienie o błędzie serwera
+        toast.error(error.response.data.error || 'Wystąpił błąd podczas rejestracji');
+      } else {
+        console.error('Error during registration:', error);
+        setServerError('Wystąpił błąd podczas rejestracji. Spróbuj ponownie później.');
+        // Powiadomienie o ogólnym błędzie
+        toast.error('Wystąpił błąd podczas rejestracji. Spróbuj ponownie później.');
+      }
+    }
+  };
 
   const handleLoginRedirect = () => {
     navigate('/login');
@@ -131,6 +141,9 @@ const SignUp = () => {
       <p>
         Masz już konto? <span onClick={handleLoginRedirect} className="login-link">Zaloguj się</span>
       </p>
+
+      {/* Dodanie ToastContainer w komponencie */}
+      <ToastContainer />
     </div>
   );
 };

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify"; // Import `toast` i `ToastContainer`
+import "react-toastify/dist/ReactToastify.css"; // Import CSS dla `react-toastify`
 import "./DogDetail.css";
 
 const DogDetail = () => {
@@ -57,18 +59,20 @@ const DogDetail = () => {
           data: { dog_id: breed.dog_id }, // Poprawka tutaj
         });
         setIsFavorite(false);
+        toast.success(`${breed.race} has been removed from your favorites!`); // Powiadomienie o usunięciu
       } else {
         // Dodaj do ulubionych
         await axios.post("http://localhost:5000/user/favorites/add", {
           dog_id: breed.dog_id,
         });
         setIsFavorite(true);
+        toast.success(`${breed.race} has been added to your favorites!`); // Powiadomienie o dodaniu
       }
     } catch (err) {
       setFavoriteError(err.response?.data?.error || "Error updating favorites");
+      toast.error("There was an error updating favorites."); // Powiadomienie o błędzie
     }
   };
-  
 
   if (loading) {
     return <h2>Loading...</h2>;
@@ -106,6 +110,9 @@ const DogDetail = () => {
         <li>Cost Range: {breed.cost_range || "Unknown"}</li>
       </ul>
       {favoriteError && <p className="error">Error: {favoriteError}</p>}
+
+      {/* Dodanie ToastContainer w komponencie */}
+      <ToastContainer />
     </div>
   );
 };

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "./AuthProvider";
-import { Link } from "react-router-dom"; // Import `Link`
-import axios from "axios"; // Import `axios`
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify"; // Import `toast` i `ToastContainer`
+import "react-toastify/dist/ReactToastify.css"; // Import CSS dla `react-toastify`
 import "./MyAccount.css";
 
 const MyAccount = ({ favoriteBreeds }) => {
-  const { user, logout } = useAuth(); // Pobranie funkcji `logout` z kontekstu AuthProvider
+  const { user, logout } = useAuth(); 
   const isLoggedIn = !!user;
   const [userData, setUserData] = useState(null);
   const [formData, setFormData] = useState({
@@ -39,7 +41,6 @@ const MyAccount = ({ favoriteBreeds }) => {
     }
   }, [isLoggedIn, user]);
 
-  // Funkcja do obsługi zmiany wartości pól formularza
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
@@ -48,45 +49,42 @@ const MyAccount = ({ favoriteBreeds }) => {
     }));
   };
 
-  // Funkcja do edycji danych użytkownika
   const handleUpdateUser = async () => {
     try {
       const response = await axios.put("http://localhost:5000/user", {
         customer_nickname: formData.customer_nickname,
         email_addr: formData.email_addr,
       });
-      setSuccessMessage(response.data.message);
+      toast.success(response.data.message); // Użycie toast.success
       setErrorMessage(null);
     } catch (err) {
-      setErrorMessage(err.response?.data?.error || "Error updating user data.");
+      toast.error(err.response?.data?.error || "Error updating user data."); // Użycie toast.error
       setSuccessMessage(null);
     }
   };
 
-  // Funkcja do zmiany hasła
   const handleUpdatePassword = async () => {
     try {
       const response = await axios.put("http://localhost:5000/user/update-password", {
         current_password: formData.current_password,
         new_password: formData.new_password,
       });
-      setSuccessMessage(response.data.message);
+      toast.success(response.data.message); // Użycie toast.success
       setErrorMessage(null);
     } catch (err) {
-      setErrorMessage(err.response?.data?.error || "Error updating password.");
+      toast.error(err.response?.data?.error || "Error updating password."); // Użycie toast.error
       setSuccessMessage(null);
     }
   };
 
-  // Funkcja do usuwania konta
   const handleDeleteAccount = async () => {
     if (window.confirm("Are you sure you want to delete your account? This action is irreversible.")) {
       try {
         const response = await axios.delete("http://localhost:5000/user");
-        alert(response.data.message);
-        logout(); // Wyloguj użytkownika po usunięciu konta
+        toast.success(response.data.message); // Użycie toast.success
+        logout(); // Wylogowanie użytkownika po usunięciu konta
       } catch (err) {
-        setErrorMessage(err.response?.data?.error || "Error deleting account.");
+        toast.error(err.response?.data?.error || "Error deleting account."); // Użycie toast.error
       }
     }
   };
@@ -158,9 +156,6 @@ const MyAccount = ({ favoriteBreeds }) => {
             <button onClick={handleDeleteAccount} className="delete-button">
               Delete Account
             </button>
-
-            {errorMessage && <p className="error-message">{errorMessage}</p>}
-            {successMessage && <p className="success-message">{successMessage}</p>}
           </>
         ) : (
           <>
@@ -175,6 +170,9 @@ const MyAccount = ({ favoriteBreeds }) => {
           </>
         )}
       </div>
+
+      {/* ToastContainer should be placed somewhere in your component tree */}
+      <ToastContainer />
     </section>
   );
 };
