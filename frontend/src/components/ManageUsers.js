@@ -34,28 +34,6 @@ const ManageUsers = () => {
     fetchUsers();
   }, []);
 
-  // Funkcja do zmiany roli użytkownika
-  const handleRoleChange = async (userId, newRole) => {
-    try {
-      const response = await axios.patch(
-        `http://localhost:5000/user/${userId}/role`,
-        { role: newRole }
-      );
-      if (response.status === 200) {
-        setUsers((prevUsers) =>
-          prevUsers.map((user) =>
-            user.user_id === userId ? { ...user, role: newRole } : user
-          )
-        );
-        toast.info(`User role updated to ${newRole}.`);
-      }
-    } catch (err) {
-      console.error("Error updating role:", err);
-      setError("Failed to update role.");
-      toast.error("Failed to update user role.");
-    }
-  };
-
   // Funkcja do banowania użytkownika na 24 godziny
   const handleBanUser = async (userId) => {
     try {
@@ -144,13 +122,7 @@ const ManageUsers = () => {
                 <td>{user.customer_nickname}</td>
                 <td>{user.email_addr}</td>
                 <td>
-                  <select
-                    value={user.role}
-                    onChange={(e) => handleRoleChange(user.user_id, e.target.value)}
-                  >
-                    <option value="admin">Admin</option>
-                    <option value="user">User</option>
-                  </select>
+                  <span>{user.role}</span> {/* Wyświetlamy tylko rolę użytkownika */}
                 </td>
                 <td>{user.is_banned ? "Yes" : "No"}</td>
                 <td>
