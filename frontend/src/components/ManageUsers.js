@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./ManageUsers.css";
 
 const ManageUsers = () => {
@@ -22,6 +24,7 @@ const ManageUsers = () => {
         }
       } catch (err) {
         setError("Failed to load users.");
+        toast.error("Error loading users.");
         console.error("Error fetching users:", err);
       } finally {
         setLoading(false);
@@ -44,10 +47,12 @@ const ManageUsers = () => {
             user.user_id === userId ? { ...user, role: newRole } : user
           )
         );
+        toast.info(`User role updated to ${newRole}.`);
       }
     } catch (err) {
       console.error("Error updating role:", err);
       setError("Failed to update role.");
+      toast.error("Failed to update user role.");
     }
   };
 
@@ -63,10 +68,12 @@ const ManageUsers = () => {
             user.user_id === userId ? { ...user, is_banned: true } : user
           )
         );
+        toast.success(`User ${userId} has been banned for 24h.`);
       }
     } catch (err) {
       console.error("Error banning user:", err);
       setError("Failed to ban user.");
+      toast.error("Failed to ban user.");
     }
   };
 
@@ -82,10 +89,12 @@ const ManageUsers = () => {
             user.user_id === userId ? { ...user, is_banned: false } : user
           )
         );
+        toast.info(`User ${userId} has been unbanned.`);
       }
     } catch (err) {
       console.error("Error unbanning user:", err);
       setError("Failed to unban user.");
+      toast.error("Failed to unban user.");
     }
   };
 
@@ -95,10 +104,12 @@ const ManageUsers = () => {
       const response = await axios.delete(`http://localhost:5000/user/${userId}`);
       if (response.status === 200) {
         setUsers((prevUsers) => prevUsers.filter((user) => user.user_id !== userId));
+        toast.error(`User ${userId} has been deleted.`);
       }
     } catch (err) {
       console.error("Error deleting user:", err);
       setError("Failed to delete user.");
+      toast.error("Failed to delete user.");
     }
   };
 
@@ -113,6 +124,7 @@ const ManageUsers = () => {
   return (
     <div className="manage-users-container">
       <h2>Manage Users</h2>
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
       <table className="users-table">
         <thead>
           <tr>
