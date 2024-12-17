@@ -63,15 +63,32 @@ const Login = () => {
       // Przekierowanie po zalogowaniu
       navigate('/');
     } catch (error) {
-      if (error.response && error.response.data) {
-        setServerError(error.response.data.message || 'Nieprawidłowe dane logowania');
-        // Powiadomienie o błędzie logowania
-        toast.error(error.response.data.message || 'Nieprawidłowe dane logowania');
+      if (error.response) {
+        if (error.response.status === 403) {
+          // Obsługa zbanowanego użytkownika
+          toast.error("Twoje konto zostało zbanowane!", {
+            position: "top-center",
+            autoClose: false, // Toast pozostaje na ekranie
+            style: {
+              fontSize: "1.5rem",
+              textAlign: "center",
+              color: "#fff",
+              background: "#d9534f",
+            },
+          });
+        } else if (error.response.status === 401) {
+          // Błędny email lub hasło
+          setServerError("Nieprawidłowy email lub hasło.");
+          toast.error("Nieprawidłowy email lub hasło.");
+        } else {
+          // Inny błąd
+          setServerError(error.response.data.error || "Wystąpił błąd serwera.");
+          toast.error(error.response.data.error || "Wystąpił błąd serwera.");
+        }
       } else {
         console.error('Error during login:', error);
-        setServerError('Wystąpił błąd podczas logowania. Spróbuj ponownie później.');
-        // Powiadomienie o ogólnym błędzie logowania
-        toast.error('Wystąpił błąd podczas logowania. Spróbuj ponownie później.');
+        setServerError("Wystąpił błąd podczas logowania. Spróbuj ponownie później.");
+        toast.error("Wystąpił błąd podczas logowania. Spróbuj ponownie później.");
       }
     }
   };
