@@ -46,7 +46,7 @@ const ManageUsers = () => {
             user.user_id === userId ? { ...user, is_banned: true } : user
           )
         );
-        toast.success(`User ${userId} has been banned for 24h.`);
+        toast.success(`User ${userId} has been banned.`);
       }
     } catch (err) {
       console.error("Error banning user:", err);
@@ -138,7 +138,7 @@ const ManageUsers = () => {
                       onClick={() => handleBanUser(user.user_id)}
                       className="ban-button"
                     >
-                      Ban for 24h
+                      Ban
                     </button>
                   )}
                   <button
