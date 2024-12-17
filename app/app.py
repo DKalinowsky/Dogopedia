@@ -397,7 +397,7 @@ def ban_user(user_id):
 # New endpoint: Admin unban user
 @app.route("/user/<int:user_id>/unban", methods=["PATCH"])
 @token_required
-def ban_user(user_id):
+def uban_user(user_id):
 
     conn = None
     cursor = None
