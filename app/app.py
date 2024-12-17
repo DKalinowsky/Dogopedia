@@ -394,6 +394,33 @@ def ban_user(user_id):
         if conn:
             conn.close()
 
+# New endpoint: Admin unban user
+@app.route("/user/<int:user_id>/unban", methods=["PATCH"])
+@token_required
+def ban_user(user_id):
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        # Set is_banned to False
+        cursor.execute("UPDATE USER SET is_banned = FALSE WHERE user_id = %s", (user_id,))
+        conn.commit()
+
+        # Check if any row was actually updated
+        if cursor.rowcount == 0:
+            return jsonify({"error": "User not found"}), 404
+
+        return jsonify({"message": "User unbanned successfully"}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 # New endpoint: Admin delete user
 @app.route("/user/<int:user_id>", methods=["DELETE"])
 @token_required
