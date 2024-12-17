@@ -29,7 +29,7 @@ const ManageUsers = () => {
     };
 
     fetchUsers();
-  }, []); // Tylko raz przy pierwszym renderowaniu komponentu
+  }, []);
 
   // Funkcja do zmiany roli użytkownika
   const handleRoleChange = async (userId, newRole) => {
@@ -67,6 +67,25 @@ const ManageUsers = () => {
     } catch (err) {
       console.error("Error banning user:", err);
       setError("Failed to ban user.");
+    }
+  };
+
+  // Funkcja do odbanowania użytkownika
+  const handleUnbanUser = async (userId) => {
+    try {
+      const response = await axios.patch(
+        `http://localhost:5000/user/${userId}/unban`
+      );
+      if (response.status === 200) {
+        setUsers((prevUsers) =>
+          prevUsers.map((user) =>
+            user.user_id === userId ? { ...user, is_banned: false } : user
+          )
+        );
+      }
+    } catch (err) {
+      console.error("Error unbanning user:", err);
+      setError("Failed to unban user.");
     }
   };
 
@@ -123,12 +142,25 @@ const ManageUsers = () => {
                 </td>
                 <td>{user.is_banned ? "Yes" : "No"}</td>
                 <td>
-                  {!user.is_banned && (
-                    <button onClick={() => handleBanUser(user.user_id)} className="ban-button">
+                  {user.is_banned ? (
+                    <button
+                      onClick={() => handleUnbanUser(user.user_id)}
+                      className="unban-button"
+                    >
+                      Unban
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleBanUser(user.user_id)}
+                      className="ban-button"
+                    >
                       Ban for 24h
                     </button>
                   )}
-                  <button onClick={() => handleDeleteUser(user.user_id)} className="delete-button">
+                  <button
+                    onClick={() => handleDeleteUser(user.user_id)}
+                    className="delete-button"
+                  >
                     Delete User
                   </button>
                 </td>
