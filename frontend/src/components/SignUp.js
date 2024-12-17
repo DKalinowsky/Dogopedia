@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify'; // Import `toast` i `ToastContainer`
-import 'react-toastify/dist/ReactToastify.css'; // Import CSS dla `react-toastify`
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './SignUp.css';
 
 const SignUp = () => {
@@ -19,6 +19,12 @@ const SignUp = () => {
   const [serverError, setServerError] = useState(null);
   const navigate = useNavigate();
 
+  // Funkcja do walidacji silnych haseł
+  const isStrongPassword = (password) => {
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/;
+    return strongPasswordRegex.test(password);
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -34,8 +40,18 @@ const SignUp = () => {
 
     if (!formData.nickname) validationErrors.nickname = 'Pseudonim jest wymagany';
     if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) validationErrors.email = 'Podaj poprawny email';
-    if (!formData.password) validationErrors.password = 'Hasło jest wymagane';
-    if (formData.password !== formData.confirmPassword) validationErrors.confirmPassword = 'Hasła muszą być identyczne';
+
+    // Sprawdzanie silnego hasła
+    if (!formData.password) {
+      validationErrors.password = 'Hasło jest wymagane';
+    } else if (!isStrongPassword(formData.password)) {
+      validationErrors.password =
+        'Hasło musi mieć co najmniej 12 znaków, w tym dużą literę, małą literę, cyfrę i znak specjalny.';
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      validationErrors.confirmPassword = 'Hasła muszą być identyczne';
+    }
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -47,8 +63,8 @@ const SignUp = () => {
 
     try {
       const response = await axios.post('http://localhost:5000/register', {
-        customer_nickname: formData.nickname, // Zmiana na oczekiwany klucz
-        email_addr: formData.email, // Zmiana na oczekiwany klucz
+        customer_nickname: formData.nickname,
+        email_addr: formData.email,
         password: formData.password,
       });
 
@@ -62,12 +78,10 @@ const SignUp = () => {
     } catch (error) {
       if (error.response && error.response.data) {
         setServerError(error.response.data.error || 'Wystąpił błąd podczas rejestracji');
-        // Powiadomienie o błędzie serwera
         toast.error(error.response.data.error || 'Wystąpił błąd podczas rejestracji');
       } else {
         console.error('Error during registration:', error);
         setServerError('Wystąpił błąd podczas rejestracji. Spróbuj ponownie później.');
-        // Powiadomienie o ogólnym błędzie
         toast.error('Wystąpił błąd podczas rejestracji. Spróbuj ponownie później.');
       }
     }
@@ -142,7 +156,6 @@ const SignUp = () => {
         Masz już konto? <span onClick={handleLoginRedirect} className="login-link">Zaloguj się</span>
       </p>
 
-      {/* Dodanie ToastContainer w komponencie */}
       <ToastContainer />
     </div>
   );
