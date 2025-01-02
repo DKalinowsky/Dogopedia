@@ -451,6 +451,372 @@ def admin_delete_user(user_id):
             cursor.close()
         if conn:
             conn.close()
+@app.route("/comments", methods=["POST"])
+@token_required
+def add_comment():
+    """
+    Add a new comment to a dog.
+    Requires a valid JWT token.
+    """
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No input data provided"}), 400
+
+    user_id = request.user['user_id']  # Extracted from the JWT
+    dog_id = data.get("dog_id")
+    comm_text = data.get("comm_text")
+    comm_type = data.get("comm_type")
+
+    # Validate required fields
+    if not dog_id or not comm_text or not comm_type:
+        return jsonify({"error": "dog_id, comm_text, and comm_type are required"}), 400
+
+    # Validate comm_type
+    if comm_type not in ["positive", "neutral", "negative"]:
+        return jsonify({"error": "Invalid comm_type. Must be one of 'positive', 'neutral', or 'negative'."}), 400
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        insert_query = """
+            INSERT INTO COMMENTS (user_id, dog_id, comm_text, comm_type)
+            VALUES (%s, %s, %s, %s)
+        """
+        cursor.execute(insert_query, (user_id, dog_id, comm_text, comm_type))
+        conn.commit()
+
+        # Get the last inserted comment ID
+        new_comm_id = cursor.lastrowid
+
+        return jsonify({
+            "message": "Comment added successfully",
+            "comment_id": new_comm_id
+        }), 201
+
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+
+@app.route("/dogs/<int:dog_id>/comments", methods=["GET"])
+def get_comments_for_dog(dog_id):
+    """
+    Retrieve all comments for a given dog_id.
+    Does not require authentication.
+    """
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # We can also join with USER if we want to show the nickname of the commenter
+        select_query = """
+            SELECT c.comm_id, c.user_id, u.customer_nickname, c.dog_id,
+                   c.comm_text, c.comm_type
+            FROM COMMENTS c
+            JOIN USER u ON c.user_id = u.user_id
+            WHERE c.dog_id = %s
+        """
+        cursor.execute(select_query, (dog_id,))
+        comments = cursor.fetchall()
+
+        return jsonify(comments), 200
+
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+
+@app.route("/comments/<int:comm_id>", methods=["PUT"])
+@token_required
+def update_comment(comm_id):
+    """
+    Update an existing comment by its ID.
+    The user must be the owner of the comment or an admin.
+    """
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No input data provided"}), 400
+
+    new_comm_text = data.get("comm_text")
+    new_comm_type = data.get("comm_type")
+
+    if not new_comm_text and not new_comm_type:
+        return jsonify({"error": "No fields to update"}), 400
+
+    # Validate new_comm_type if provided
+    if new_comm_type and new_comm_type not in ["positive", "neutral", "negative"]:
+        return jsonify({"error": "Invalid comm_type. Must be 'positive', 'neutral', or 'negative'."}), 400
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # 1) Check if the comment exists
+        cursor.execute("SELECT user_id FROM COMMENTS WHERE comm_id = %s", (comm_id,))
+        comment = cursor.fetchone()
+        if not comment:
+            return jsonify({"error": "Comment not found"}), 404
+
+        # 2) Check if the user is the owner or admin
+        owner_id = comment["user_id"]
+        current_user_id = request.user["user_id"]
+        current_user_role = request.user["role"]
+
+        if current_user_id != owner_id and current_user_role != "admin":
+            return jsonify({"error": "Forbidden: You are not allowed to update this comment"}), 403
+
+        # 3) Update the comment
+        update_fields = []
+        update_values = []
+
+        if new_comm_text:
+            update_fields.append("comm_text = %s")
+            update_values.append(new_comm_text)
+        if new_comm_type:
+            update_fields.append("comm_type = %s")
+            update_values.append(new_comm_type)
+
+        update_values.append(comm_id)  # for the WHERE clause
+        update_query = f"UPDATE COMMENTS SET {', '.join(update_fields)} WHERE comm_id = %s"
+        cursor.execute(update_query, tuple(update_values))
+        conn.commit()
+
+        return jsonify({"message": "Comment updated successfully"}), 200
+
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+
+@app.route("/comments/<int:comm_id>", methods=["DELETE"])
+@token_required
+def delete_comment(comm_id):
+    """
+    Delete a specific comment by its ID.
+    The user must be the owner of the comment or an admin.
+    """
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # 1) Check if the comment exists
+        cursor.execute("SELECT user_id FROM COMMENTS WHERE comm_id = %s", (comm_id,))
+        comment = cursor.fetchone()
+        if not comment:
+            return jsonify({"error": "Comment not found"}), 404
+
+        # 2) Check if the user is the owner or admin
+        owner_id = comment["user_id"]
+        current_user_id = request.user["user_id"]
+        current_user_role = request.user["role"]
+
+        if current_user_id != owner_id and current_user_role != "admin":
+            return jsonify({"error": "Forbidden: You are not allowed to delete this comment"}), 403
+
+        # 3) Delete the comment
+        cursor.execute("DELETE FROM COMMENTS WHERE comm_id = %s", (comm_id,))
+        conn.commit()
+
+        return jsonify({"message": "Comment deleted successfully"}), 200
+
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+@app.route("/dog", methods=["POST"])
+@token_required
+def add_dog():
+    """
+    Create a new dog breed entry.
+    Only accessible to administrators (admin role).
+    """
+    # Check if user is admin
+    if request.user['role'] != 'admin':
+        return jsonify({"error": "Forbidden: Only admins can add dog records."}), 403
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No input data provided"}), 400
+
+    race = data.get("race")
+    size = data.get("size")
+    category = data.get("category")
+    traits = data.get("traits")
+    allergies = data.get("allergies")
+    age = data.get("age")
+    description = data.get("description")
+    cost_range = data.get("cost_range")
+    activity = data.get("activity")
+    # image handling is optional; left out here for simplicity
+
+    # Basic validation
+    if not race or not size or not age or not cost_range or not activity:
+        return jsonify({"error": "Missing required fields: race, size, age, cost_range, activity"}), 400
+
+    # Validate that `activity` matches the ENUM('low','medium','high') in the database
+    if activity not in ["low", "medium", "high"]:
+        return jsonify({"error": "Invalid activity type. Must be 'low', 'medium', or 'high'"}), 400
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        insert_query = """
+            INSERT INTO DOGS (race, size, category, traits, allergies, age, description, cost_range, activity)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(
+            insert_query,
+            (race, size, category, traits, allergies, age, description, cost_range, activity)
+        )
+        conn.commit()
+
+        new_dog_id = cursor.lastrowid
+        return jsonify({
+            "message": "New dog breed added successfully",
+            "dog_id": new_dog_id
+        }), 201
+
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+@app.route("/dog/<int:dog_id>", methods=["PUT"])
+@token_required
+def update_dog(dog_id):
+    """
+    Update an existing dog breed entry by its dog_id.
+    Only accessible to administrators (admin role).
+    """
+    # Check if user is admin
+    if request.user['role'] != 'admin':
+        return jsonify({"error": "Forbidden: Only admins can update dog records."}), 403
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No input data provided"}), 400
+
+    # Collect possible updated fields
+    race = data.get("race")
+    size = data.get("size")
+    category = data.get("category")
+    traits = data.get("traits")
+    allergies = data.get("allergies")
+    age = data.get("age")
+    description = data.get("description")
+    cost_range = data.get("cost_range")
+    activity = data.get("activity")
+
+    # Build the update query dynamically based on the fields provided
+    update_fields = []
+    update_values = []
+
+    if race is not None:
+        update_fields.append("race = %s")
+        update_values.append(race)
+    if size is not None:
+        update_fields.append("size = %s")
+        update_values.append(size)
+    if category is not None:
+        update_fields.append("category = %s")
+        update_values.append(category)
+    if traits is not None:
+        update_fields.append("traits = %s")
+        update_values.append(traits)
+    if allergies is not None:
+        update_fields.append("allergies = %s")
+        update_values.append(allergies)
+    if age is not None:
+        update_fields.append("age = %s")
+        update_values.append(age)
+    if description is not None:
+        update_fields.append("description = %s")
+        update_values.append(description)
+    if cost_range is not None:
+        update_fields.append("cost_range = %s")
+        update_values.append(cost_range)
+    if activity is not None:
+        # Validate that `activity` matches the ENUM('low','medium','high')
+        if activity not in ["low", "medium", "high"]:
+            return jsonify({"error": "Invalid activity type. Must be 'low', 'medium', or 'high'"}), 400
+        update_fields.append("activity = %s")
+        update_values.append(activity)
+
+    # If no fields to update, respond early
+    if not update_fields:
+        return jsonify({"error": "No fields provided to update"}), 400
+
+    # Prepare the SQL
+    update_values.append(dog_id)  # this is for the WHERE clause
+    update_query = f"UPDATE DOGS SET {', '.join(update_fields)} WHERE dog_id = %s"
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Check if the dog entry exists
+        check_query = "SELECT dog_id FROM DOGS WHERE dog_id = %s"
+        cursor.execute(check_query, (dog_id,))
+        dog_exists = cursor.fetchone()
+        if not dog_exists:
+            return jsonify({"error": "Dog entry not found"}), 404
+
+        # Perform the update
+        cursor.execute(update_query, tuple(update_values))
+        conn.commit()
+
+        # Check if the update actually affected any rows
+        if cursor.rowcount == 0:
+            return jsonify({"warning": "No changes applied (row not found or no new data)."}), 200
+
+        return jsonify({"message": "Dog breed updated successfully"}), 200
+
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 @app.route("/protected", methods=["GET"])
 @token_required
