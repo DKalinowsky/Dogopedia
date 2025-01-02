@@ -6,7 +6,7 @@
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   text-align: center;
-  position: relative; /* Dodano, aby umożliwić pozycjonowanie serduszka */
+  position: relative; /* Pozycjonowanie dla serduszka */
 }
 
 .dog-detail-image {
@@ -60,4 +60,152 @@
 .favorite-button:hover {
   color: #ff6666; /* Kolor po najechaniu */
   transform: scale(1.1); /* Efekt powiększenia */
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.tab {
+  padding: 10px 20px;
+  margin: 0 5px;
+  cursor: pointer;
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.tab.active {
+  background-color: #ffcc00;
+  color: #fff;
+  font-weight: bold;
+}
+
+.tab:hover {
+  background-color: #ffe680;
+}
+
+.comments-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+  text-align: left;
+}
+
+.comment-item {
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.add-comment-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-comment-button:hover {
+  background-color: #0056b3;
+}
+
+/* Przycisk "Update Information" */
+.update-info-button {
+  display: inline-block;
+  margin: 20px 0;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.update-info-button:hover {
+  background-color: #0056b3;
+}
+
+/* Popup dla aktualizacji informacji */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background: #fff;
+  padding: 20px;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.popup-content h2 {
+  margin-bottom: 15px;
+  font-size: 20px;
+  text-align: center;
+}
+
+.popup-content label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.popup-content input,
+.popup-content textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.popup-content textarea {
+  resize: vertical;
+}
+
+.popup-content button {
+  display: inline-block;
+  margin: 5px 10px 0 0;
+  padding: 10px 20px;
+  font-size: 14px;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.popup-content button:hover {
+  background-color: #0056b3;
+}
+
+.popup-content button:last-of-type {
+  background-color: #6c757d;
+}
+
+.popup-content button:last-of-type:hover {
+  background-color: #5a6268;
 }

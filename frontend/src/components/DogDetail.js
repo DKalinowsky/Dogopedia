@@ -1,46 +1,39 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify"; // Import `toast` i `ToastContainer`
-import "react-toastify/dist/ReactToastify.css"; // Import CSS dla `react-toastify`
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./DogDetail.css";
 
 const DogDetail = () => {
-  const { dogId } = useParams(); // Wyciągnięcie ID psa z URL
-  const [breed, setBreed] = useState(null); // Przechowywanie danych o rasie
+  const { dogId } = useParams();
+  const [breed, setBreed] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isFavorite, setIsFavorite] = useState(false); // Stan ulubionego psa
-  const [favoriteError, setFavoriteError] = useState(null); // Obsługa błędu ulubionych
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteError, setFavoriteError] = useState(null);
+  const [comments, setComments] = useState({ forum: [], care: [], fun: [] });
+  const [activeTab, setActiveTab] = useState("forum");
+  const [showAddCommentPopup, setShowAddCommentPopup] = useState(false);
+  const [showUpdateInfoPopup, setShowUpdateInfoPopup] = useState(false);
+  const [newComment, setNewComment] = useState("");
+  const [updatedInfo, setUpdatedInfo] = useState({});
 
   useEffect(() => {
-    const fetchBreedAndFavorites = async () => {
+    const fetchData = async () => {
       try {
-        // Pobierz szczegóły psa
-        const response = await axios.get("http://localhost:5000/dogs");
-        const data = response.data;
+        const breedResponse = await axios.get("http://localhost:5000/dogs");
+        const breedData = breedResponse.data.find(
+          (dog) => dog.dog_id === parseInt(dogId)
+        );
+        if (!breedData) throw new Error("Breed not found");
 
-        // Znajdź psa na podstawie dog_id
-        const foundBreed = data.find((dog) => dog.dog_id === parseInt(dogId));
+        setBreed(breedData);
 
-        if (!foundBreed) {
-          throw new Error("Breed not found");
-        }
-
-        // Jeśli `traits` jest ciągiem znaków, rozdziel go na tablicę
-        if (typeof foundBreed.traits === "string") {
-          foundBreed.traits = foundBreed.traits.split(",").map((trait) => trait.trim());
-        }
-
-        setBreed(foundBreed);
-
-        // Sprawdź, czy pies jest w ulubionych
-        const favoritesResponse = await axios.get("http://localhost:5000/liked");
-        const favoriteDogs = favoritesResponse.data;
-
-        // Jeśli `dogId` jest na liście ulubionych, ustaw `isFavorite` na true
-        const isFavoriteDog = favoriteDogs.some((favorite) => favorite.dog_id === foundBreed.dog_id);
-        setIsFavorite(isFavoriteDog);
+        const commentsResponse = await axios.get(
+          `http://localhost:5000/comments/${dogId}`
+        );
+        setComments(commentsResponse.data);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -48,45 +41,75 @@ const DogDetail = () => {
       }
     };
 
-    fetchBreedAndFavorites();
+    fetchData();
   }, [dogId]);
 
   const handleFavoriteClick = async () => {
     try {
       if (isFavorite) {
-        // Usuń z ulubionych
         await axios.delete("http://localhost:5000/user/favorites/remove", {
-          data: { dog_id: breed.dog_id }, // Poprawka tutaj
+          data: { dog_id: breed.dog_id },
         });
         setIsFavorite(false);
-        toast.success(`${breed.race} has been removed from your favorites!`); // Powiadomienie o usunięciu
+        toast.success(`${breed.race} has been removed from your favorites!`);
       } else {
-        // Dodaj do ulubionych
         await axios.post("http://localhost:5000/user/favorites/add", {
           dog_id: breed.dog_id,
         });
         setIsFavorite(true);
-        toast.success(`${breed.race} has been added to your favorites!`); // Powiadomienie o dodaniu
+        toast.success(`${breed.race} has been added to your favorites!`);
       }
     } catch (err) {
       setFavoriteError(err.response?.data?.error || "Error updating favorites");
-      toast.error("There was an error updating favorites."); // Powiadomienie o błędzie
+      toast.error("There was an error updating favorites.");
     }
   };
 
-  if (loading) {
-    return <h2>Loading...</h2>;
-  }
+  const handleAddComment = async () => {
+    try {
+      await axios.post(`http://localhost:5000/comments/add`, {
+        dog_id: dogId,
+        category: activeTab,
+        comment: newComment,
+      });
+      setComments((prev) => ({
+        ...prev,
+        [activeTab]: [...prev[activeTab], newComment],
+      }));
+      setNewComment("");
+      setShowAddCommentPopup(false);
+      toast.success("Comment added successfully!");
+    } catch (err) {
+      toast.error("Failed to add comment.");
+    }
+  };
 
-  if (error) {
-    return <h2>Error: {error}</h2>;
-  }
+  const handleUpdateInfo = async () => {
+    try {
+      await axios.post("http://localhost:5000/dogs/update", {
+        dog_id: dogId,
+        ...updatedInfo,
+      });
+      toast.success("Update request sent for validation!");
+      setShowUpdateInfoPopup(false);
+    } catch (err) {
+      toast.error("Failed to send update request.");
+    }
+  };
+
+  const openUpdateInfoPopup = () => {
+    setUpdatedInfo(breed); // Wypełnij formularz aktualnymi danymi
+    setShowUpdateInfoPopup(true);
+  };
+
+  if (loading) return <h2>Loading...</h2>;
+  if (error) return <h2>Error: {error}</h2>;
 
   return (
     <div className="dog-detail">
       <div className="dog-detail-header">
         <img
-          src={breed.image || "default-image-url"} // Placeholder dla braku obrazu
+          src={breed.image || "default-image-url"}
           alt={breed.race}
           className="dog-detail-image"
         />
@@ -109,9 +132,123 @@ const DogDetail = () => {
         <li>Allergies: {breed.allergies || "None"}</li>
         <li>Cost Range: {breed.cost_range || "Unknown"}</li>
       </ul>
-      {favoriteError && <p className="error">Error: {favoriteError}</p>}
 
-      {/* Dodanie ToastContainer w komponencie */}
+      <button
+        className="update-info-button"
+        onClick={openUpdateInfoPopup}
+      >
+        Update Information
+      </button>
+
+      {/* Zakładki komentarzy */}
+      <div className="tabs">
+        <button
+          className={`tab ${activeTab === "forum" ? "active" : ""}`}
+          onClick={() => setActiveTab("forum")}
+        >
+          Forum Dyskusyjne
+        </button>
+        <button
+          className={`tab ${activeTab === "care" ? "active" : ""}`}
+          onClick={() => setActiveTab("care")}
+        >
+          Pielęgnacja
+        </button>
+        <button
+          className={`tab ${activeTab === "fun" ? "active" : ""}`}
+          onClick={() => setActiveTab("fun")}
+        >
+          Rozrywka
+        </button>
+      </div>
+
+      <ul className="comments-list">
+        {comments[activeTab].map((comment, index) => (
+          <li key={index} className="comment-item">
+            {comment}
+          </li>
+        ))}
+      </ul>
+
+      <button
+        className="add-comment-button"
+        onClick={() => setShowAddCommentPopup(true)}
+      >
+        Add Comment
+      </button>
+
+      {showAddCommentPopup && (
+        <div className="popup">
+          <div className="popup-content">
+            <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Write your comment here..."
+            ></textarea>
+            <button onClick={handleAddComment}>Submit</button>
+            <button onClick={() => setShowAddCommentPopup(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {showUpdateInfoPopup && (
+        <div className="popup">
+          <div className="popup-content">
+            <h2>Update Information</h2>
+            <label>
+              Race:
+              <input
+                type="text"
+                value={updatedInfo.race}
+                onChange={(e) =>
+                  setUpdatedInfo((prev) => ({ ...prev, race: e.target.value }))
+                }
+              />
+            </label>
+            <label>
+              Description:
+              <textarea
+                value={updatedInfo.description}
+                onChange={(e) =>
+                  setUpdatedInfo((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
+              ></textarea>
+            </label>
+            <label>
+              Category:
+              <input
+                type="text"
+                value={updatedInfo.category}
+                onChange={(e) =>
+                  setUpdatedInfo((prev) => ({
+                    ...prev,
+                    category: e.target.value,
+                  }))
+                }
+              />
+            </label>
+            <label>
+              Size:
+              <input
+                type="text"
+                value={updatedInfo.size}
+                onChange={(e) =>
+                  setUpdatedInfo((prev) => ({
+                    ...prev,
+                    size: e.target.value,
+                  }))
+                }
+              />
+            </label>
+            <button onClick={handleUpdateInfo}>Submit</button>
+            <button onClick={() => setShowUpdateInfoPopup(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+
       <ToastContainer />
     </div>
   );
