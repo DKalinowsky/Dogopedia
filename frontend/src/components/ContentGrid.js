@@ -12,6 +12,15 @@ const ContentGrid = () => {
   const [sortOrder, setSortOrder] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const dogsPerPage = 9;
+  const [showAddForm, setShowAddForm] = useState(false); // Popup
+  const [newDog, setNewDog] = useState({
+    race: "",
+    category: "",
+    size: "",
+    traits: "",
+    description: "",
+    image: "",
+  });
 
   const navigate = useNavigate();
 
@@ -100,7 +109,50 @@ const ContentGrid = () => {
     navigate(`/dog-breed/${dogId}`); // Przekazujemy dog_id w URL
   };
   
+  const handleAddDogChange = (e) => {
+    const { name, value, type, checked } = e.target;
+  
+    if (type === 'checkbox') {
+      // Jeśli checkbox jest zaznaczony, dodajemy cechę do tablicy, w przeciwnym razie ją usuwamy
+      setNewDog((prevDog) => {
+        const updatedTraits = checked
+          ? [...prevDog.traits, value] // Dodaj cechę
+          : prevDog.traits.filter((trait) => trait !== value); // Usuń cechę
+        return { ...prevDog, [name]: updatedTraits }; // Zaktualizuj stan cech
+      });
+    } else {
+      // Inne pola formularza (np. tekstowe, select)
+      setNewDog((prevDog) => ({
+        ...prevDog,
+        [name]: value,
+      }));
+    }
+  };
+  
+  
 
+  const handleAddDogSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:5000/dogs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newDog),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add dog");
+      }
+
+      const addedDog = await response.json();
+      setDogBreeds([...dogBreeds, addedDog]);
+      setShowAddForm(false);
+    } catch (error) {
+      console.error("Error adding dog:", error.message);
+    }
+  };
   const pageNumbers = [];
   for (let i = 1; i <= Math.ceil(filteredDogs.length / dogsPerPage); i++) {
     pageNumbers.push(i);
@@ -196,7 +248,6 @@ const ContentGrid = () => {
   ))}
 </div>
 
-
       {/* Paginacja */}
       <div className="pagination">
         {pageNumbers.map((number) => (
@@ -205,7 +256,135 @@ const ContentGrid = () => {
           </button>
         ))}
       </div>
+      
+      {/* Dodanie rasy psa */}
+<div className="add-dog-container">
+        <p>Nie znalazłeś rasy psa, której szukałeś?</p>
+        <button onClick={() => setShowAddForm(true)}>Dodaj rasę psa</button>
+      </div>
+
+      {showAddForm && (
+  <div className="popup">
+    <div className="popup-content">
+      <h3>Dodaj nową rasę psa</h3>
+      <form onSubmit={handleAddDogSubmit}>
+        <input
+          type="text"
+          name="race"
+          placeholder="Nazwa rasy"
+          value={newDog.race}
+          onChange={handleAddDogChange}
+          required
+        />
+
+        {/* Kategoria */}
+        <select
+          name="category"
+          value={newDog.category}
+          onChange={handleAddDogChange}
+          required
+        >
+          <option value="">Wybierz kategorię</option>
+          <option value="Sporting">Sporting</option>
+          <option value="Herding">Herding</option>
+          <option value="Non-Sporting">Non-Sporting</option>
+          <option value="Hound">Hound</option>
+          <option value="Working">Working</option>
+          <option value="Toy">Toy</option>
+        </select>
+
+        {/* Rozmiar */}
+        <select
+          name="size"
+          value={newDog.size}
+          onChange={handleAddDogChange}
+          required
+        >
+          <option value="">Wybierz rozmiar</option>
+          <option value="Small">Small</option>
+          <option value="Medium">Medium</option>
+          <option value="Large">Large</option>
+        </select>
+
+        <textarea
+          name="description"
+          placeholder="Opis"
+          value={newDog.description}
+          onChange={handleAddDogChange}
+        ></textarea>
+
+        {/* Cechy: Checkboxy */}
+        <div className="traits-checkboxes">
+          <label>
+            <input
+              type="checkbox"
+              name="traits"
+              value="Intelligent"
+              checked={newDog.traits.includes('Intelligent')}
+              onChange={handleAddDogChange}
+            />
+            Intelligent
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="traits"
+              value="Friendly"
+              checked={newDog.traits.includes('Friendly')}
+              onChange={handleAddDogChange}
+            />
+            Friendly
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="traits"
+              value="Protective"
+              checked={newDog.traits.includes('Protective')}
+              onChange={handleAddDogChange}
+            />
+            Protective
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="traits"
+              value="Energetic"
+              checked={newDog.traits.includes('Energetic')}
+              onChange={handleAddDogChange}
+            />
+            Energetic
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="traits"
+              value="Calm"
+              checked={newDog.traits.includes('Calm')}
+              onChange={handleAddDogChange}
+            />
+            Calm
+          </label>
+        </div>
+
+        <input
+          type="text"
+          name="image"
+          placeholder="URL obrazka"
+          value={newDog.image}
+          onChange={handleAddDogChange}
+        />
+
+        <button type="submit">Dodaj</button>
+        <button type="button" onClick={() => setShowAddForm(false)}>
+          Anuluj
+        </button>
+      </form>
+          </div>
+        </div>
+      )}
     </section>
+    
   );
 };
 
