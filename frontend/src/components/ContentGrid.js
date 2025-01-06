@@ -134,7 +134,7 @@ const ContentGrid = () => {
   const handleAddDogSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:5000/dogs", {
+      const response = await fetch("http://localhost:5000/new-dogs", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
