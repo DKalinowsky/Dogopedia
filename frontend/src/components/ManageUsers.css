@@ -127,4 +127,90 @@ button.delete-button {
     background-color: #ccc;
     cursor: not-allowed;
   }
-  
+  /* Kontener dla nowych sekcji */
+.section-container {
+  margin-top: 40px;
+}
+
+/* Nagłówki nowych sekcji */
+.section-container h2 {
+  text-align: center;
+  color: #333;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+/* Tabela wewnątrz nowych sekcji */
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.users-table th,
+.users-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.users-table th {
+  background-color: #007bff;
+  color: #fff;
+  font-weight: bold;
+}
+
+.users-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Przyciski dla działań w tabelach */
+button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  background-color: #28a745;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-right: 10px;
+}
+
+button:hover {
+  background-color: #218838;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Styl przycisków w nowych sekcjach */
+button.update-button {
+  background-color: #ffc107; /* Żółty kolor dla przycisku aktualizacji */
+}
+
+button.update-button:hover {
+  background-color: #e0a800;
+}
+
+button.resolve-button {
+  background-color: #007bff; /* Niebieski kolor dla przycisku rozwiązania */
+}
+
+button.resolve-button:hover {
+  background-color: #0069d9;
+}
+
+button.delete-button {
+  background-color: #dc3545; /* Czerwony kolor dla przycisku usuwania */
+}
+
+button.delete-button:hover {
+  background-color: #c82333;
+}

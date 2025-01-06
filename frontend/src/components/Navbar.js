@@ -31,7 +31,7 @@ const Navbar = () => {
           {userRole === "admin" && (
             <li>
               <Link to="/manage-users" className="navbar-link">
-                Manage Users
+                Manage
               </Link>
             </li>
           )}

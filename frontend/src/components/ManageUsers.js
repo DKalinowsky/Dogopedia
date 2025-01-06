@@ -5,90 +5,43 @@ import "react-toastify/dist/ReactToastify.css";
 import "./ManageUsers.css";
 
 const ManageUsers = () => {
-  const [users, setUsers] = useState([]); // Lista użytkowników
-  const [loading, setLoading] = useState(true); // Status ładowania
-  const [error, setError] = useState(null); // Błąd ładowania
+  const [users, setUsers] = useState([]);
+  const [dogs, setDogs] = useState([]);
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Pobranie danych użytkowników z backendu
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/user");
+        const usersResponse = await axios.get("http://localhost:5000/user");
+        const dogsResponse = await axios.get("http://localhost:5000/dogs");
+        const reportsResponse = await axios.get("http://localhost:5000/reports");
 
-        console.log(response.data); // Sprawdzamy odpowiedź backendu
-
-        if (response.status === 200) {
-          setUsers(response.data); // Ustawiamy użytkowników w stanie
-        } else {
-          throw new Error("Failed to fetch users.");
-        }
+        setUsers(usersResponse.data);
+        setDogs(dogsResponse.data);
+        setReports(reportsResponse.data);
       } catch (err) {
-        setError("Failed to load users.");
-        toast.error("Error loading users.");
-        console.error("Error fetching users:", err);
+        setError("Failed to load data.");
+        toast.error("Error loading data.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUsers();
+    fetchData();
   }, []);
 
-  // Funkcja do banowania użytkownika na 24 godziny
   const handleBanUser = async (userId) => {
-    try {
-      const response = await axios.patch(
-        `http://localhost:5000/user/${userId}/ban`
-      );
-      if (response.status === 200) {
-        setUsers((prevUsers) =>
-          prevUsers.map((user) =>
-            user.user_id === userId ? { ...user, is_banned: true } : user
-          )
-        );
-        toast.success(`User ${userId} has been banned.`);
-      }
-    } catch (err) {
-      console.error("Error banning user:", err);
-      setError("Failed to ban user.");
-      toast.error("Failed to ban user.");
-    }
+    // Implementacja banowania użytkownika
   };
 
-  // Funkcja do odbanowania użytkownika
   const handleUnbanUser = async (userId) => {
-    try {
-      const response = await axios.patch(
-        `http://localhost:5000/user/${userId}/unban`
-      );
-      if (response.status === 200) {
-        setUsers((prevUsers) =>
-          prevUsers.map((user) =>
-            user.user_id === userId ? { ...user, is_banned: false } : user
-          )
-        );
-        toast.info(`User ${userId} has been unbanned.`);
-      }
-    } catch (err) {
-      console.error("Error unbanning user:", err);
-      setError("Failed to unban user.");
-      toast.error("Failed to unban user.");
-    }
+    // Implementacja odbanowywania użytkownika
   };
 
-  // Funkcja do usuwania użytkownika
   const handleDeleteUser = async (userId) => {
-    try {
-      const response = await axios.delete(`http://localhost:5000/user/${userId}`);
-      if (response.status === 200) {
-        setUsers((prevUsers) => prevUsers.filter((user) => user.user_id !== userId));
-        toast.error(`User ${userId} has been deleted.`);
-      }
-    } catch (err) {
-      console.error("Error deleting user:", err);
-      setError("Failed to delete user.");
-      toast.error("Failed to delete user.");
-    }
+    // Implementacja usuwania użytkownika
   };
 
   if (loading) {
@@ -122,7 +75,7 @@ const ManageUsers = () => {
                 <td>{user.customer_nickname}</td>
                 <td>{user.email_addr}</td>
                 <td>
-                  <span>{user.role}</span> {/* Wyświetlamy tylko rolę użytkownika */}
+                  <span>{user.role}</span>
                 </td>
                 <td>{user.is_banned ? "Yes" : "No"}</td>
                 <td>
@@ -157,6 +110,82 @@ const ManageUsers = () => {
           )}
         </tbody>
       </table>
+
+      {/* Nowa sekcja New/Updated Dogs */}
+      <div className="section-container">
+        <h2>New/Updated Dogs</h2>
+        <table className="users-table">
+          <thead>
+            <tr>
+              <th>Dog ID</th>
+              <th>Dog Name</th>
+              <th>Breed</th>
+              <th>Size</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {dogs.length > 0 ? (
+              dogs.map((dog) => (
+                <tr key={dog.dog_id}>
+                  <td>{dog.dog_id}</td>
+                  <td>{dog.name}</td>
+                  <td>{dog.breed}</td>
+                  <td>{dog.size}</td>
+                  <td>{dog.status}</td>
+                  <td>
+                    <button className="update-button">Update</button>
+                    <button className="delete-button">Delete</button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6">No dogs found.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Nowa sekcja Reports */}
+      <div className="section-container">
+        <h2>Reports</h2>
+        <table className="users-table">
+          <thead>
+            <tr>
+              <th>Report ID</th>
+              <th>User ID</th>
+              <th>Content</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {reports.length > 0 ? (
+              reports.map((report) => (
+                <tr key={report.report_id}>
+                  <td>{report.report_id}</td>
+                  <td>{report.user_id}</td>
+                  <td>{report.content}</td>
+                  <td>{report.date}</td>
+                  <td>{report.status}</td>
+                  <td>
+                    <button className="resolve-button">Resolve</button>
+                    <button className="delete-button">Delete</button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6">No reports found.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
