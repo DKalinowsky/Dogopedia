@@ -82,4 +82,4 @@ VALUES
 
 
 INSERT INTO COMMENTS (user_id, dog_id, comm_text, comm_type)
-VALUES (1, 1, 'Great dog!', 'positive');
+VALUES (1, 1, 'Great dog!', 'forum');
