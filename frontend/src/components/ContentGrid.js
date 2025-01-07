@@ -236,7 +236,7 @@ const ContentGrid = () => {
       onClick={() => handleCardClick(dog.dog_id)} // Przekazywanie dog_id do funkcji
     >
       <img
-        src={`/photos/${breed.race}.jpg`} // Placeholder dla braku obrazu
+        src={`/photos/${dog.race}.jpg`} // Placeholder dla braku obrazu
         alt={dog.race}
         className="dog-image"
       />
