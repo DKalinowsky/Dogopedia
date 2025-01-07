@@ -472,8 +472,8 @@ def add_comment():
         return jsonify({"error": "dog_id, comm_text, and comm_type are required"}), 400
 
     # Validate comm_type
-    if comm_type not in ["positive", "neutral", "negative"]:
-        return jsonify({"error": "Invalid comm_type. Must be one of 'positive', 'neutral', or 'negative'."}), 400
+    if comm_type not in ['forum', 'care', 'entertainment']:
+        return jsonify({"error": "Invalid comm_type. Must be one of 'forum', 'care', 'entertainment'."}), 400
 
     conn = None
     cursor = None
