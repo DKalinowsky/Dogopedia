@@ -35,19 +35,11 @@ CREATE TABLE COMMENTS (
     user_id INT NOT NULL,
     dog_id INT NOT NULL,
     comm_text VARCHAR(255) NOT NULL,
-    comm_type ENUM('positive', 'neutral', 'negative') NOT NULL,
+    comm_type ENUM('forum', 'care', 'entertainment') NOT NULL,
     FOREIGN KEY (user_id) REFERENCES USER(user_id),
     FOREIGN KEY (dog_id) REFERENCES DOGS(dog_id)
 );
 
-CREATE TABLE REPORTS (
-    report_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    comm_id INT NOT NULL,
-    report_reason TEXT NOT NULL,
-    status CHAR(50),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (comm_id) REFERENCES COMMENTS(comm_id)
-);
 
 -- Insert example data
 INSERT INTO USER (customer_nickname, pass_hash, email_addr, is_banned, role)
