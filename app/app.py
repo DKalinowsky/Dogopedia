@@ -559,8 +559,8 @@ def update_comment(comm_id):
         return jsonify({"error": "No fields to update"}), 400
 
     # Validate new_comm_type if provided
-    if new_comm_type and new_comm_type not in ["positive", "neutral", "negative"]:
-        return jsonify({"error": "Invalid comm_type. Must be 'positive', 'neutral', or 'negative'."}), 400
+    if new_comm_type and new_comm_type not in ['forum', 'care', 'entertainment']:
+        return jsonify({"error": "Invalid comm_type. Must be 'forum', 'care', 'entertainment'."}), 400
 
     conn = None
     cursor = None
