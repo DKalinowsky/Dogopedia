@@ -17,7 +17,7 @@ async function fetchDogs() {
       const mappedDog = {
         id: dog.dog_id,  // Zmieniamy dog_id na id
         name: dog.race,  // Zmieniamy race na name
-        imageUrl: dog.image || 'default-image.jpg',  // Dodajemy domyślny obrazek, jeśli brak
+        imageUrl: `/photos/${dog.race}.jpg` || 'default-image.jpg',  // Dodajemy domyślny obrazek, jeśli brak
         description: dog.description,  // Opis
         category: dog.category || 'Unknown',  // Ustawiamy "Unknown", jeśli brak kategorii
         size: dog.size || 'Unknown',  // Ustawiamy "Unknown", jeśli brak rozmiaru

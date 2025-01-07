@@ -9,7 +9,7 @@ import "./Dashboard.css";
 const mapDogData = (dog) => ({
   id: dog.dog_id,
   name: dog.race,
-  imageUrl: dog.image || "default-image.jpg",
+  imageUrl: `/photos/${dog.race}.jpg` || "default-image.jpg",
   description: dog.description || "No description available.",
   category: dog.category || "Unknown",
   size: dog.size || "Unknown",

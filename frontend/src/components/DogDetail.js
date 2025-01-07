@@ -135,7 +135,12 @@ const DogDetail = () => {
     <div className="dog-detail">
       <div className="dog-detail-header">
         <img
-          src={breed.image || "default-image-url"} // Placeholder dla braku obrazu
+          src={`/photos/${breed.race}.jpg`}
+          onError={(e) => {
+            if (e.target.src !== "/photos/default-image.jpg") {
+              e.target.src = "/photos/default-image.jpg"; // Zapobiega nieskończonemu cyklowi
+            }
+          }}
           alt={breed.race}
           className="dog-detail-image"
         />
