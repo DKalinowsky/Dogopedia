@@ -148,6 +148,16 @@ const MyAccount = ({ favoriteBreeds }) => {
                 onChange={handleChange}
               />
             </div>
+            <div className="form-group">
+              <label htmlFor="new_password">Confirm New Password:</label>
+              <input
+                type="password"
+                id="new_password"
+                name="new_password"
+                value={formData.new_password}
+                onChange={handleChange}
+              />
+            </div>
             <button onClick={handleUpdatePassword} className="update-button">
               Update Password
             </button>
