@@ -16,11 +16,9 @@ const ManageUsers = () => {
       try {
         const usersResponse = await axios.get("http://localhost:5000/user");
         const dogsResponse = await axios.get("http://localhost:5000/dogs");
-        const reportsResponse = await axios.get("http://localhost:5000/reports");
 
         setUsers(usersResponse.data);
         setDogs(dogsResponse.data);
-        setReports(reportsResponse.data);
       } catch (err) {
         setError("Failed to load data.");
         toast.error("Error loading data.");
@@ -143,44 +141,6 @@ const ManageUsers = () => {
             ) : (
               <tr>
                 <td colSpan="6">No dogs found.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Nowa sekcja Reports */}
-      <div className="section-container">
-        <h2>Reports</h2>
-        <table className="users-table">
-          <thead>
-            <tr>
-              <th>Report ID</th>
-              <th>User ID</th>
-              <th>Content</th>
-              <th>Date</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {reports.length > 0 ? (
-              reports.map((report) => (
-                <tr key={report.report_id}>
-                  <td>{report.report_id}</td>
-                  <td>{report.user_id}</td>
-                  <td>{report.content}</td>
-                  <td>{report.date}</td>
-                  <td>{report.status}</td>
-                  <td>
-                    <button className="resolve-button">Resolve</button>
-                    <button className="delete-button">Delete</button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6">No reports found.</td>
               </tr>
             )}
           </tbody>
