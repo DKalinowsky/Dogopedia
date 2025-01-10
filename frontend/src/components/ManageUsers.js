@@ -7,9 +7,11 @@ import "./ManageUsers.css";
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
   const [dogs, setDogs] = useState([]);
-  const [reports, setReports] = useState([]);
+  const [dogBreeds, setDogBreeds] = useState([]);
+  const [filteredDogs, setFilteredDogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -19,6 +21,8 @@ const ManageUsers = () => {
 
         setUsers(usersResponse.data);
         setDogs(dogsResponse.data);
+        setDogBreeds(dogsResponse.data);
+        setFilteredDogs(dogsResponse.data);
       } catch (err) {
         setError("Failed to load data.");
         toast.error("Error loading data.");
@@ -42,6 +46,18 @@ const ManageUsers = () => {
     // Implementacja usuwania użytkownika
   };
 
+  const handleDeleteBreed = async (dogId) => {
+    try {
+      await axios.delete(`http://localhost:5000/dogs/${dogId}`);
+      setDogBreeds(dogBreeds.filter(dog => dog.dog_id !== dogId));
+      setFilteredDogs(filteredDogs.filter(dog => dog.dog_id !== dogId));
+      toast.success("Breed deleted successfully!");
+    } catch (err) {
+      console.error("Error deleting breed:", err);
+      toast.error("Failed to delete breed.");
+    }
+  };
+
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
@@ -54,6 +70,8 @@ const ManageUsers = () => {
     <div className="manage-users-container">
       <h2>Manage Users</h2>
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
+
+      {/* Sekcja Użytkowników */}
       <table className="users-table">
         <thead>
           <tr>
@@ -109,9 +127,8 @@ const ManageUsers = () => {
         </tbody>
       </table>
 
-      {/* Nowa sekcja New/Updated Dogs */}
+      {/* Sekcja psów */}
       <div className="section-container">
-        <h2>New/Updated Dogs</h2>
         <table className="users-table">
           <thead>
             <tr>
@@ -146,6 +163,54 @@ const ManageUsers = () => {
           </tbody>
         </table>
       </div>
+      <div className="breed-delete">
+      <h2>Dana rasa wymarła?</h2>
+        <button onClick={() => setShowDeletePopup(true)} className="delete-breed-button">
+          Usuń ją teraz
+        </button>
+        </div>
+
+      {/* Popup do usuwania rasy */}
+      {showDeletePopup && (
+        <div className="popup-overlay">
+          <div className="popup">
+            <h3>Wybierz rasę do usunięcia</h3>
+            <button onClick={() => setShowDeletePopup(false)} className="close-popup-button">
+              Zamknij
+            </button>
+            <input
+              type="text"
+              placeholder="Szukaj po rasie"
+              onChange={(e) => {
+                const query = e.target.value.toLowerCase();
+                setFilteredDogs(dogBreeds.filter(dog => dog.race.toLowerCase().includes(query)));
+              }}
+            />
+            <table className="dog-breed-table">
+              <thead>
+                <tr>
+                  <th>Dog ID</th>
+                  <th>Breed Name</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredDogs.map((dog) => (
+                  <tr key={dog.dog_id}>
+                    <td>{dog.dog_id}</td>
+                    <td>{dog.race}</td>
+                    <td>
+                      <button onClick={() => handleDeleteBreed(dog.dog_id)} className="delete-button">
+                        Usuń
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

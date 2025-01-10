@@ -1,146 +1,22 @@
 /* Kontener dla całej strony */
 .manage-users-container {
-    max-width: 1000px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Nagłówek */
-  .manage-users-container h2 {
-    text-align: center;
-    color: #333;
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-  
-  /* Tabela */
-  .users-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .users-table th,
-  .users-table td {
-    padding: 12px 16px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .users-table th {
-    background-color: #007bff;
-    color: #fff;
-    font-weight: bold;
-  }
-  
-  .users-table tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-  
-  /* Stylizacja selektora ról */
-  .users-table select {
-    padding: 6px 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #fff;
-    font-size: 14px;
-    color: #333;
-    cursor: pointer;
-  }
-  
-  .users-table select:focus {
-    outline: none;
-    border-color: #007bff;
-  }
-  
-  /* Stylizacja przycisków */
-  button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 5px;
-    background-color: #28a745;
-    color: #fff;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-right: 10px;
-  }
-  
-  button:hover {
-    background-color: #218838;
-  }
-  
-  button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-  
-  /* Przycisk bana */
-  button.ban-button {
-    background-color: #dc3545;
-  }
-  
-  button.ban-button:hover {
-    background-color: #c82333;
-  }
-  
-  /* Stylizacja komunikatów o braku użytkowników */
-  .users-table td[colspan="5"] {
-    text-align: center;
-    padding: 20px;
-    font-style: italic;
-    color: #888;
-  }
-  
-  /* Animacja ładowania */
-  .loading {
-    text-align: center;
-    font-size: 18px;
-    color: #007bff;
-    padding: 20px;
-  }
-  /* Przycisk usuwania użytkownika */
-button.delete-button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 5px;
-    background-color: #dc3545; /* Czerwony kolor dla przycisku usuwania */
-    color: #fff;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-left: 10px;
-  }
-  
-  button.delete-button:hover {
-    background-color: #c82333;
-  }
-  
-  button.delete-button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-  /* Kontener dla nowych sekcji */
-.section-container {
-  margin-top: 40px;
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Nagłówki nowych sekcji */
-.section-container h2 {
+/* Nagłówek */
+.manage-users-container h2 {
   text-align: center;
   color: #333;
   font-size: 24px;
   margin-bottom: 20px;
 }
 
-/* Tabela wewnątrz nowych sekcji */
+/* Tabela */
 .users-table {
   width: 100%;
   border-collapse: collapse;
@@ -168,7 +44,23 @@ button.delete-button {
   background-color: #f2f2f2;
 }
 
-/* Przyciski dla działań w tabelach */
+/* Stylizacja selektora ról */
+.users-table select {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+}
+
+.users-table select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+/* Stylizacja przycisków */
 button {
   padding: 8px 16px;
   border: none;
@@ -190,7 +82,59 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* Styl przycisków w nowych sekcjach */
+/* Przycisk bana */
+button.ban-button {
+  background-color: #dc3545;
+}
+
+button.ban-button:hover {
+  background-color: #c82333;
+}
+
+/* Przycisk usuwania użytkownika */
+button.delete-button {
+  background-color: #dc3545; /* Czerwony kolor dla przycisku usuwania */
+}
+
+button.delete-button:hover {
+  background-color: #c82333;
+}
+
+button.delete-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Stylizacja komunikatów o braku użytkowników */
+.users-table td[colspan="5"] {
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+  color: #888;
+}
+
+/* Animacja ładowania */
+.loading {
+  text-align: center;
+  font-size: 18px;
+  color: #007bff;
+  padding: 20px;
+}
+
+/* Kontener dla nowych sekcji */
+.section-container {
+  margin-top: 40px;
+}
+
+/* Nagłówki nowych sekcji */
+.section-container h2 {
+  text-align: center;
+  color: #333;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+/* Przyciski dla działań w tabelach */
 button.update-button {
   background-color: #ffc107; /* Żółty kolor dla przycisku aktualizacji */
 }
@@ -207,10 +151,136 @@ button.resolve-button:hover {
   background-color: #0069d9;
 }
 
-button.delete-button {
-  background-color: #dc3545; /* Czerwony kolor dla przycisku usuwania */
+/* Przyciski do usuwania psów */
+button.remove-dog-breed-button {
+  background-color: red;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
 }
 
-button.delete-button:hover {
-  background-color: #c82333;
+/* Popup Overlay */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Popup Container */
+.popup {
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  width: 450px;
+  max-width: 90%;
+  position: relative;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Popup Title */
+.popup h3 {
+  margin-top: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* Close Button */
+.close-popup-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: transparent;
+  border: none;
+  font-size: 20px;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.close-popup-button:hover {
+  color: #333;
+}
+
+/* Search Input */
+.popup input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 15px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.popup input[type="text"]:focus {
+  border-color: #4CAF50;
+}
+
+/* Dog Breed Table */
+.dog-breed-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 15px;
+}
+
+.dog-breed-table th,
+.dog-breed-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+.dog-breed-table th {
+  background-color: #f8f8f8;
+  font-weight: 600;
+  color: #555;
+}
+
+.dog-breed-table td {
+  background-color: #fff;
+}
+
+.dog-breed-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Delete Button in Popup */
+.popup .delete-button {
+  background-color: #ff4d4d;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.popup .delete-button:hover {
+  background-color: #e60000;
+}
+
+/* Animation for Popup */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
