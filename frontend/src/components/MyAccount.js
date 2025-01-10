@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "./AuthProvider";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify"; // Import `toast` i `ToastContainer`
-import "react-toastify/dist/ReactToastify.css"; // Import CSS dla `react-toastify`
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./MyAccount.css";
 
 const MyAccount = ({ favoriteBreeds }) => {
-  const { user, logout } = useAuth(); 
+  const { user, logout } = useAuth();
   const isLoggedIn = !!user;
   const [userData, setUserData] = useState(null);
   const [formData, setFormData] = useState({
@@ -15,9 +15,8 @@ const MyAccount = ({ favoriteBreeds }) => {
     email_addr: "",
     current_password: "",
     new_password: "",
+    confirm_new_password: "", // Dodano pole do potwierdzenia nowego hasła
   });
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -55,25 +54,34 @@ const MyAccount = ({ favoriteBreeds }) => {
         customer_nickname: formData.customer_nickname,
         email_addr: formData.email_addr,
       });
-      toast.success(response.data.message); // Użycie toast.success
-      setErrorMessage(null);
+      toast.success(response.data.message);
     } catch (err) {
-      toast.error(err.response?.data?.error || "Error updating user data."); // Użycie toast.error
-      setSuccessMessage(null);
+      toast.error(err.response?.data?.error || "Error updating user data.");
     }
   };
 
   const handleUpdatePassword = async () => {
+    // Walidacja nowego hasła i potwierdzenia
+    if (formData.new_password !== formData.confirm_new_password) {
+      toast.error("New password and confirmation do not match.");
+      return;
+    }
+
     try {
       const response = await axios.put("http://localhost:5000/user/update-password", {
         current_password: formData.current_password,
         new_password: formData.new_password,
       });
-      toast.success(response.data.message); // Użycie toast.success
-      setErrorMessage(null);
+      toast.success(response.data.message);
+      // Wyczyść pola hasła po udanej zmianie
+      setFormData((prevState) => ({
+        ...prevState,
+        current_password: "",
+        new_password: "",
+        confirm_new_password: "",
+      }));
     } catch (err) {
-      toast.error(err.response?.data?.error || "Error updating password."); // Użycie toast.error
-      setSuccessMessage(null);
+      toast.error(err.response?.data?.error || "Error updating password.");
     }
   };
 
@@ -81,10 +89,10 @@ const MyAccount = ({ favoriteBreeds }) => {
     if (window.confirm("Are you sure you want to delete your account? This action is irreversible.")) {
       try {
         const response = await axios.delete("http://localhost:5000/user");
-        toast.success(response.data.message); // Użycie toast.success
-        logout(); // Wylogowanie użytkownika po usunięciu konta
+        toast.success(response.data.message);
+        logout();
       } catch (err) {
-        toast.error(err.response?.data?.error || "Error deleting account."); // Użycie toast.error
+        toast.error(err.response?.data?.error || "Error deleting account.");
       }
     }
   };
@@ -149,12 +157,12 @@ const MyAccount = ({ favoriteBreeds }) => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="new_password">Confirm New Password:</label>
+              <label htmlFor="confirm_new_password">Confirm New Password:</label>
               <input
                 type="password"
-                id="new_password"
-                name="new_password"
-                value={formData.new_password}
+                id="confirm_new_password"
+                name="confirm_new_password"
+                value={formData.confirm_new_password}
                 onChange={handleChange}
               />
             </div>
@@ -180,8 +188,6 @@ const MyAccount = ({ favoriteBreeds }) => {
           </>
         )}
       </div>
-
-      {/* ToastContainer should be placed somewhere in your component tree */}
       <ToastContainer />
     </section>
   );
