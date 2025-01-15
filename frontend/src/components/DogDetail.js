@@ -63,6 +63,25 @@ const DogDetail = () => {
     fetchBreedAndFavorites();
   }, [dogId]);
 
+  const handleEditComment = (commId, currentText) => {
+    setNewComment(currentText); // Wypełnij pole tekstowe istniejącym komentarzem
+    setShowPopup(true); // Otwórz popup dla edycji
+  };
+  
+  const handleDeleteComment = async (commId) => {
+    try {
+      await axios.delete(`http://localhost:5000/comments/${commId}`);
+      setComments((prevComments) => ({
+        ...prevComments,
+        [activeTab]: prevComments[activeTab].filter((comment) => comment.comm_id !== commId),
+      }));
+      toast.success("Comment deleted successfully!");
+    } catch {
+      toast.error("Failed to delete comment.");
+    }
+  };
+  
+
   const handleFavoriteClick = async () => {
     try {
       if (isFavorite) {
@@ -230,12 +249,29 @@ const DogDetail = () => {
           ))}
         </div>
         <ul className="comments-list">
-          {comments[activeTab].map((comment) => (
-            <li key={comment.comm_id} className="comment-item">
-              <strong>{comment.customer_nickname || "Anonymous"}:</strong> {comment.comm_text}
-            </li>
-          ))}
-        </ul>
+  {comments[activeTab].map((comment) => (
+    <li key={comment.comm_id} className="comment-item">
+      <div className="comment-text">
+        <strong>{comment.customer_nickname || "Anonymous"}:</strong> {comment.comm_text}
+      </div>
+      <div className="comment-actions">
+        <button
+          className="button edit-comment-button"
+          onClick={() => handleEditComment(comment.comm_id, comment.comm_text)}
+        >
+          Edit
+        </button>
+        <button
+          className="button delete-comment-button"
+          onClick={() => handleDeleteComment(comment.comm_id)}
+        >
+          Delete
+        </button>
+      </div>
+    </li>
+  ))}
+</ul>
+
         <button className="button add-comment-button" onClick={() => setShowPopup(true)}>
           Add Comment
         </button>

@@ -269,3 +269,34 @@
 .add-comment-button:hover {
   background-color: #0056b3; /* Ciemniejszy turkusowy przy hover */
 }
+.comment-actions {
+  display: flex;
+
+  gap: 10px; /* Odstęp między przyciskami */
+}
+
+.edit-comment-button {
+  background-color: #ffc107; /* Żółty kolor dla edycji */
+}
+
+.edit-comment-button:hover {
+  background-color: #e0a800; /* Ciemniejszy żółty */
+}
+
+.delete-comment-button {
+  background-color: #dc3545; /* Czerwony kolor dla usuwania */
+}
+
+.delete-comment-button:hover {
+  background-color: #c82333; /* Ciemniejszy czerwony */
+}
+
+.comment-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.comment-text {
+  margin-bottom: 10px;
+}
