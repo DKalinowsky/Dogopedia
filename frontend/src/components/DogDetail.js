@@ -166,16 +166,37 @@ const handleEditComment = (commId, currentText) => {
     setEditPopup(true);
   };
 
-  const handleUpdate = async () => {
-    try {
-      await axios.put(`http://localhost:5000/dog/${dogId}`, updatedData);
-      setBreed(updatedData); // Zaktualizuj dane na stronie
-      toast.success("Dog information updated successfully!");
-      setEditPopup(false);
-    } catch (err) {
-      toast.error("Failed to update dog information.");
-    }
-  };
+const handleUpdate = async () => {
+  // Sprawdzamy, czy wszystkie wymagane dane są dostępne
+  if (!updatedData.race || !updatedData.size || !updatedData.category || !updatedData.traits || !updatedData.allergies || !updatedData.age || !updatedData.description || !updatedData.cost_range || !updatedData.activity) {
+    toast.error("Please fill in all fields before submitting.");
+    return;
+  }
+
+  try {
+    // Mapowanie danych z formularza (np. `updatedData`) na format oczekiwany przez backend
+    const dataToSend = {
+      race: updatedData.race,
+      size: updatedData.size,
+      category: updatedData.category,
+      traits: updatedData.traits,
+      allergies: updatedData.allergies,
+      age: updatedData.age,
+      description: updatedData.description,
+      cost_range: updatedData.cost_range,
+      activity: updatedData.activity,
+    };
+
+    // Wysyłamy dane na endpoint request-update
+    const response = await axios.post(`http://localhost:5000/dog/request-update/${dogId}`, dataToSend);
+
+    toast.success("Dog information update request submitted successfully!");
+    setEditPopup(false);
+  } catch (err) {
+    // Obsługa błędów
+    toast.error("Failed to submit update request.");
+  }
+};
 
   if (loading) {
     return <h2>Loading...</h2>;
@@ -222,53 +243,88 @@ const handleEditComment = (commId, currentText) => {
       </button>
 
       {editPopup && (
-        <div className="popup">
-          <div className="popup-content">
-            <h2>Edit Dog Information</h2>
-            <label>
-              Race:
-              <input
-                type="text"
-                value={updatedData.race}
-                onChange={(e) => setUpdatedData({ ...updatedData, race: e.target.value })}
-              />
-            </label>
-            <label>
-              Size:
-              <input
-                type="text"
-                value={updatedData.size}
-                onChange={(e) => setUpdatedData({ ...updatedData, size: e.target.value })}
-              />
-            </label>
-            <label>
-              Category:
-              <input
-                type="text"
-                value={updatedData.category}
-                onChange={(e) => setUpdatedData({ ...updatedData, category: e.target.value })}
-              />
-            </label>
-            <label>
-              Traits:
-              <input
-                type="text"
-                value={updatedData.traits}
-                onChange={(e) => setUpdatedData({ ...updatedData, traits: e.target.value })}
-              />
-            </label>
-            <label>
-              Description:
-              <textarea
-                value={updatedData.description}
-                onChange={(e) => setUpdatedData({ ...updatedData, description: e.target.value })}
-              />
-            </label>
-            <button onClick={handleUpdate}>Submit</button>
-            <button onClick={() => setEditPopup(false)}>Cancel</button>
-          </div>
-        </div>
-      )}
+  <div className="popup">
+    <div className="popup-content">
+      <h2>Edit Dog Information</h2>
+      <label>
+  Race:
+  <input
+    type="text"
+    value={updatedData.race || ""}
+    onChange={(e) => setUpdatedData({ ...updatedData, race: e.target.value })}
+  />
+</label>
+<label>
+  Size:
+  <input
+    type="text"
+    value={updatedData.size || ""}
+    onChange={(e) => setUpdatedData({ ...updatedData, size: e.target.value })}
+  />
+</label>
+<label>
+  Category:
+  <input
+    type="text"
+    value={updatedData.category || ""}
+    onChange={(e) => setUpdatedData({ ...updatedData, category: e.target.value })}
+  />
+</label>
+<label>
+  Traits:
+  <input
+    type="text"
+    value={updatedData.traits || ""}
+    onChange={(e) => setUpdatedData({ ...updatedData, traits: e.target.value })}
+  />
+</label>
+<label>
+  Description:
+  <textarea
+    value={updatedData.description || ""}
+    onChange={(e) => setUpdatedData({ ...updatedData, description: e.target.value })}
+  />
+</label>
+<label>
+  Cost Range:
+  <input
+    type="text"
+    value={updatedData.cost_range || ""}
+    onChange={(e) => setUpdatedData({ ...updatedData, cost_range: e.target.value })}
+  />
+</label>
+<label>
+  Activity:
+  <input
+    type="text"
+    value={updatedData.activity || ""}
+    onChange={(e) => setUpdatedData({ ...updatedData, activity: e.target.value })}
+  />
+</label>
+
+{/* Dodane pola */}
+<label>
+  Allergies:
+  <input
+    type="text"
+    value={updatedData.allergies || ""}
+    onChange={(e) => setUpdatedData({ ...updatedData, allergies: e.target.value })}
+  />
+</label>
+<label>
+  Age:
+  <input
+    type="text"
+    value={updatedData.age || ""}
+    onChange={(e) => setUpdatedData({ ...updatedData, age: e.target.value })}
+  />
+</label>
+
+      <button onClick={handleUpdate}>Submit</button>
+      <button onClick={() => setEditPopup(false)}>Cancel</button>
+    </div>
+  </div>
+)}
 
       <div className="comments-section">
         <h2>Comments</h2>

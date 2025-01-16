@@ -12,17 +12,20 @@ const ManageUsers = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [awaitingRequests, setAwaitingRequests] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const usersResponse = await axios.get("http://localhost:5000/user");
         const dogsResponse = await axios.get("http://localhost:5000/dogs");
+        const awaitingResponse = await axios.get("http://localhost:5000/awaiting");
 
         setUsers(usersResponse.data);
         setDogs(dogsResponse.data);
         setDogBreeds(dogsResponse.data);
         setFilteredDogs(dogsResponse.data);
+        setAwaitingRequests(awaitingResponse.data);
       } catch (err) {
         setError("Failed to load data.");
         toast.error("Error loading data.");
@@ -108,6 +111,35 @@ const ManageUsers = () => {
     return <div>Error: {error}</div>;
   }
 
+  const handleApproveRequest = async (requestId, dogId, requestData) => {
+    try {
+      // Update dog breed with all the new data from the request
+      const response = await axios.put(`http://localhost:5000/dog/${dogId}`, requestData);
+
+      if (response.status === 200) {
+        // Successfully updated breed, now delete the request
+        await axios.delete(`http://localhost:5000/awaiting/${requestId}`);
+        setAwaitingRequests(awaitingRequests.filter(req => req.request_id !== requestId));
+        toast.success("Request approved and breed updated.");
+      }
+    } catch (err) {
+      console.error("Error approving request:", err);
+      toast.error("Failed to approve request.");
+    }
+  };
+
+
+  const handleDeleteRequest = async (requestId) => {
+    try {
+      await axios.delete(`http://localhost:5000/awaiting/${requestId}`);
+      setAwaitingRequests(awaitingRequests.filter(req => req.request_id !== requestId));
+      toast.success("Request deleted successfully!");
+    } catch (err) {
+      console.error("Error deleting request:", err);
+      toast.error("Failed to delete request.");
+    }
+  };
+
   return (
     <div className="manage-users-container">
       <h2>Manage Users</h2>
@@ -169,42 +201,67 @@ const ManageUsers = () => {
         </tbody>
       </table>
 
-      {/* Sekcja psów */}
+       {/* Sekcja próśb o zmiany */}
       <div className="section-container">
-        <table className="users-table">
-          <thead>
-            <tr>
-              <th>Dog ID</th>
-              <th>Dog Name</th>
-              <th>Breed</th>
-              <th>Size</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {dogs.length > 0 ? (
-              dogs.map((dog) => (
-                <tr key={dog.dog_id}>
-                  <td>{dog.dog_id}</td>
-                  <td>{dog.name}</td>
-                  <td>{dog.breed}</td>
-                  <td>{dog.size}</td>
-                  <td>{dog.status}</td>
-                  <td>
-                    <button className="update-button">Update</button>
-                    <button className="delete-button">Delete</button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6">No dogs found.</td>
+       <table className="users-table">
+        <thead>
+          <tr>
+            <th>Race</th>
+            <th>Size</th>
+            <th>Category</th>
+            <th>Traits</th>
+            <th>Allergies</th>
+            <th>Age</th>
+            <th>Description</th>
+            <th>Cost Range</th>
+            <th>Activity</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {awaitingRequests.length > 0 ? (
+            awaitingRequests.map((req) => (
+              <tr key={req.request_id}>
+                <td>{req.new_race}</td>
+                <td>{req.new_size}</td>
+                <td>{req.new_category}</td>
+                <td>{req.new_traits}</td>
+                <td>{req.new_allergies}</td>
+                <td>{req.new_age}</td>
+                <td>{req.new_description}</td>
+                <td>{req.new_cost_range}</td>
+                <td>{req.new_activity}</td>
+                <td>
+                  <button
+                    className="approve-button"
+                    onClick={() => handleApproveRequest(req.request_id, req.dog_id, {
+                      race: req.new_race,
+                      size: req.new_size,
+                      category: req.new_category,
+                      traits: req.new_traits,
+                      allergies: req.new_allergies,
+                      age: req.new_age,
+                      description: req.new_description,
+                      cost_range: req.new_cost_range,
+                      activity: req.new_activity,
+                    })}
+                  >
+                    Approve
+                  </button>
+                  <button className="delete-button" onClick={() => handleDeleteRequest(req.request_id)}>
+                    Reject
+                  </button>
+                </td>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="10">No pending requests.</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
       <div className="breed-delete">
       <h2>Dana rasa wymarła?</h2>
         <button onClick={() => setShowDeletePopup(true)} className="delete-breed-button">

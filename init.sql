@@ -23,6 +23,24 @@ CREATE TABLE DOGS (
     image BLOB
 );
 
+CREATE TABLE AWAITING (
+    request_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    dog_id INT NOT NULL,
+    new_race CHAR(50),
+    new_size CHAR(50),
+    new_category VARCHAR(255),
+    new_traits TEXT,
+    new_allergies CHAR(255),
+    new_age CHAR(50),
+    new_description TEXT,
+    new_cost_range CHAR(50),
+    new_activity ENUM('low', 'medium', 'high'),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES USER(user_id),
+    FOREIGN KEY (dog_id) REFERENCES DOGS(dog_id)
+);
+
 CREATE TABLE LIKED (
     user_id INT NOT NULL,
     dog_id INT NOT NULL,

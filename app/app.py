@@ -818,6 +818,123 @@ def update_dog(dog_id):
         if conn:
             conn.close()
 
+
+@app.route("/dog/request-update/<int:dog_id>", methods=["POST"])
+@token_required
+def request_dog_update(dog_id):
+    """
+    Allow users to submit a request to update a dog's details.
+    The request is stored in the AWAITING table for admin review.
+    """
+    user_id = request.user['user_id']  # Get user ID from token
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No input data provided"}), 400
+
+    # Collect possible updated fields
+    new_race = data.get("race")
+    new_size = data.get("size")
+    new_category = data.get("category")
+
+    # Convert the traits list to a comma-separated string
+    new_traits = ",".join(data.get("traits", []))  # Make sure it's a string, even if traits is empty
+
+    new_allergies = data.get("allergies")
+    new_age = data.get("age")
+    new_description = data.get("description")
+    new_cost_range = data.get("cost_range")
+    new_activity = data.get("activity")
+
+    # Validate activity ENUM
+    if new_activity and new_activity not in ["low", "medium", "high"]:
+        return jsonify({"error": "Invalid activity type. Must be 'low', 'medium', or 'high'"}), 400
+
+    # Check if at least one field is provided
+    if not any([new_race, new_size, new_category, new_traits, new_allergies, new_age, new_description, new_cost_range,
+                new_activity]):
+        return jsonify({"error": "No fields provided for update request"}), 400
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Check if the dog entry exists
+        check_query = "SELECT dog_id FROM DOGS WHERE dog_id = %s"
+        cursor.execute(check_query, (dog_id,))
+        dog_exists = cursor.fetchone()
+        if not dog_exists:
+            return jsonify({"error": "Dog entry not found"}), 404
+
+        # Insert the request into AWAITING table
+        insert_query = """
+            INSERT INTO AWAITING (user_id, dog_id, new_race, new_size, new_category, 
+                                  new_traits, new_allergies, new_age, new_description, 
+                                  new_cost_range, new_activity, created_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+        """
+        cursor.execute(insert_query, (
+            user_id, dog_id, new_race, new_size, new_category,
+            new_traits, new_allergies, new_age, new_description,
+            new_cost_range, new_activity
+        ))
+        conn.commit()
+
+        return jsonify({"message": "Update request submitted successfully"}), 201
+
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+
+@app.route("/awaiting/<int:request_id>", methods=["DELETE"])
+@token_required
+def delete_update_request(request_id):
+    """
+    Delete a pending dog update request.
+    Only accessible to administrators (admin role).
+    """
+    # Check if user is admin
+    if request.user['role'] != 'admin':
+        return jsonify({"error": "Forbidden: Only admins can delete update requests."}), 403
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Check if request exists
+        check_query = "SELECT request_id FROM AWAITING WHERE request_id = %s"
+        cursor.execute(check_query, (request_id,))
+        request_exists = cursor.fetchone()
+
+        if not request_exists:
+            return jsonify({"error": "Update request not found"}), 404
+
+        # Delete the request
+        delete_query = "DELETE FROM AWAITING WHERE request_id = %s"
+        cursor.execute(delete_query, (request_id,))
+        conn.commit()
+
+        return jsonify({"message": "Update request deleted successfully"}), 200
+
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 @app.route("/protected", methods=["GET"])
 @token_required
 def protected():
