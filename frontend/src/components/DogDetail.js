@@ -18,6 +18,8 @@ const DogDetail = () => {
   const [newComment, setNewComment] = useState("");
   const [editPopup, setEditPopup] = useState(false); // Popup do edycji
   const [updatedData, setUpdatedData] = useState({}); // Dane do edycji
+  const [editingCommentId, setEditingCommentId] = useState(null);
+
 
   useEffect(() => {
     const fetchBreedAndFavorites = async () => {
@@ -63,10 +65,28 @@ const DogDetail = () => {
     fetchBreedAndFavorites();
   }, [dogId]);
 
-  const handleEditComment = (commId, currentText) => {
-    setNewComment(currentText); // Wypełnij pole tekstowe istniejącym komentarzem
-    setShowPopup(true); // Otwórz popup dla edycji
-  };
+const handleUpdateComment = async (commId) => {
+  try {
+    await axios.put(`http://localhost:5000/comments/${commId}`, {
+      comm_text: newComment,
+    });
+
+    toast.success("Comment updated successfully!");
+    setShowPopup(false);
+    setNewComment("");
+
+    fetchComments();
+  } catch {
+    toast.error("Failed to update comment.");
+  }
+};
+
+const handleEditComment = (commId, currentText) => {
+  setNewComment(currentText);
+  setShowPopup(true);
+  setEditingCommentId(commId);
+};
+
   
   const handleDeleteComment = async (commId) => {
     try {
@@ -105,6 +125,19 @@ const DogDetail = () => {
     }
   };
 
+  const fetchComments = async () => {
+  try {
+    const commentsResponse = await axios.get(`http://localhost:5000/dogs/${dogId}/comments`);
+    setComments({
+      forum: commentsResponse.data.filter((c) => c.comm_type === "forum"),
+      care: commentsResponse.data.filter((c) => c.comm_type === "care"),
+      entertainment: commentsResponse.data.filter((c) => c.comm_type === "entertainment"),
+    });
+  } catch (err) {
+    toast.error("Failed to fetch comments.");
+  }
+};
+
   const handleAddComment = async () => {
     try {
       const response = await axios.post("http://localhost:5000/comments", {
@@ -121,6 +154,8 @@ const DogDetail = () => {
       toast.success("Comment added successfully!");
       setNewComment("");
       setShowPopup(false);
+
+      fetchComments();
     } catch {
       toast.error("Failed to add comment.");
     }
@@ -277,21 +312,25 @@ const DogDetail = () => {
         </button>
       </div>
       {showPopup && (
-        <div className="popup">
-          <div className="popup-content">
-            <h2>Add Comment</h2>
-            <textarea
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Type your comment here..."
-            />
-            <div>
-              <button onClick={handleAddComment}>Submit</button>
-              <button onClick={() => setShowPopup(false)}>Cancel</button>
+          <div className="popup">
+            <div className="popup-content">
+              <h2>{editingCommentId ? "Edit Comment" : "Add Comment"}</h2>
+              <textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Type your comment here..."
+              />
+              <div>
+                {editingCommentId ? (
+                  <button onClick={() => handleUpdateComment(editingCommentId)}>Update</button>
+                ) : (
+                  <button onClick={handleAddComment}>Submit</button>
+                )}
+                <button onClick={() => { setShowPopup(false); setEditingCommentId(null); }}>Cancel</button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
       <ToastContainer />
     </div>
   );
