@@ -35,15 +35,57 @@ const ManageUsers = () => {
   }, []);
 
   const handleBanUser = async (userId) => {
-    // Implementacja banowania użytkownika
+     try {
+      const response = await axios.patch(
+        `http://localhost:5000/user/${userId}/ban`
+      );
+      if (response.status === 200) {
+        setUsers((prevUsers) =>
+          prevUsers.map((user) =>
+            user.user_id === userId ? { ...user, is_banned: true } : user
+          )
+        );
+        toast.success(`User ${userId} has been banned.`);
+      }
+    } catch (err) {
+      console.error("Error banning user:", err);
+      setError("Failed to ban user.");
+      toast.error("Failed to ban user.");
+    }
   };
 
   const handleUnbanUser = async (userId) => {
-    // Implementacja odbanowywania użytkownika
+     try {
+      const response = await axios.patch(
+        `http://localhost:5000/user/${userId}/unban`
+      );
+      if (response.status === 200) {
+        setUsers((prevUsers) =>
+          prevUsers.map((user) =>
+            user.user_id === userId ? { ...user, is_banned: false } : user
+          )
+        );
+        toast.info(`User ${userId} has been unbanned.`);
+      }
+    } catch (err) {
+      console.error("Error unbanning user:", err);
+      setError("Failed to unban user.");
+      toast.error("Failed to unban user.");
+    }
   };
 
   const handleDeleteUser = async (userId) => {
-    // Implementacja usuwania użytkownika
+     try {
+      const response = await axios.delete(`http://localhost:5000/user/${userId}`);
+      if (response.status === 200) {
+        setUsers((prevUsers) => prevUsers.filter((user) => user.user_id !== userId));
+        toast.error(`User ${userId} has been deleted.`);
+      }
+    } catch (err) {
+      console.error("Error deleting user:", err);
+      setError("Failed to delete user.");
+      toast.error("Failed to delete user.");
+    }
   };
 
   const handleDeleteBreed = async (dogId) => {
