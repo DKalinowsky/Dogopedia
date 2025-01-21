@@ -93,7 +93,7 @@ const ManageUsers = () => {
 
   const handleDeleteBreed = async (dogId) => {
     try {
-      await axios.delete(`/dogs/${dogId}`);
+      await axios.delete(`/dog/${dogId}`);
       setDogBreeds(dogBreeds.filter(dog => dog.dog_id !== dogId));
       setFilteredDogs(filteredDogs.filter(dog => dog.dog_id !== dogId));
       toast.success("Breed deleted successfully!");
@@ -272,7 +272,7 @@ const ManageUsers = () => {
       {/* Popup do usuwania rasy */}
       {showDeletePopup && (
         <div className="popup-overlay">
-          <div className="popup">
+          <div className="popup-content">
             <h3>Wybierz rasę do usunięcia</h3>
             <button onClick={() => setShowDeletePopup(false)} className="close-popup-button">
               Zamknij

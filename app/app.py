@@ -818,6 +818,45 @@ def update_dog(dog_id):
         if conn:
             conn.close()
 
+@app.route("/dog/<int:dog_id>", methods=["DELETE"])
+@token_required
+def delete_dog(dog_id):
+    """
+    Delete an existing dog breed entry by its ID.
+    Only accessible to administrators (admin role).
+    """
+    if request.user['role'] != 'admin':
+        return jsonify({"error": "Forbidden: Only admins can delete dog records."}), 403
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        select_query = "SELECT COUNT(*) FROM DOGS WHERE dog_id = %s"
+        cursor.execute(select_query, (dog_id,))
+        count_result = cursor.fetchone()
+
+        if not count_result or count_result[0] == 0:
+            return jsonify({"error": f"Dog breed with ID {dog_id} not found"}), 404
+
+        delete_query = "DELETE FROM DOGS WHERE dog_id = %s"
+        cursor.execute(delete_query, (dog_id,))
+        conn.commit()
+
+        return jsonify({
+            "message": f"Dog breed with ID {dog_id} has been deleted successfully"
+        }), 200
+
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 @app.route("/dog/request-update/<int:dog_id>", methods=["POST"])
 @token_required
