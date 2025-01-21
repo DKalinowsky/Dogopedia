@@ -247,84 +247,140 @@ const handleUpdate = async () => {
     <div className="popup-content">
       <h2>Edit Dog Information</h2>
       <label>
-  Race:
-  <input
-    type="text"
-    value={updatedData.race || ""}
-    onChange={(e) => setUpdatedData({ ...updatedData, race: e.target.value })}
-  />
-</label>
-<label>
-  Size:
-  <input
-    type="text"
-    value={updatedData.size || ""}
-    onChange={(e) => setUpdatedData({ ...updatedData, size: e.target.value })}
-  />
-</label>
-<label>
-  Category:
-  <input
-    type="text"
-    value={updatedData.category || ""}
-    onChange={(e) => setUpdatedData({ ...updatedData, category: e.target.value })}
-  />
-</label>
-<label>
-  Traits:
-  <input
-    type="text"
-    value={updatedData.traits || ""}
-    onChange={(e) => setUpdatedData({ ...updatedData, traits: e.target.value })}
-  />
-</label>
-<label>
-  Description:
-  <textarea
-    value={updatedData.description || ""}
-    onChange={(e) => setUpdatedData({ ...updatedData, description: e.target.value })}
-  />
-</label>
-<label>
-  Cost Range:
-  <input
-    type="text"
-    value={updatedData.cost_range || ""}
-    onChange={(e) => setUpdatedData({ ...updatedData, cost_range: e.target.value })}
-  />
-</label>
-<label>
-  Activity:
-  <input
-    type="text"
-    value={updatedData.activity || ""}
-    onChange={(e) => setUpdatedData({ ...updatedData, activity: e.target.value })}
-  />
-</label>
-
-{/* Dodane pola */}
-<label>
-  Allergies:
-  <input
-    type="text"
-    value={updatedData.allergies || ""}
-    onChange={(e) => setUpdatedData({ ...updatedData, allergies: e.target.value })}
-  />
-</label>
-<label>
-  Age:
-  <input
-    type="text"
-    value={updatedData.age || ""}
-    onChange={(e) => setUpdatedData({ ...updatedData, age: e.target.value })}
-  />
-</label>
-
+        Race:
+        <input
+          type="text"
+          value={updatedData.race || ""}
+          onChange={(e) => setUpdatedData({ ...updatedData, race: e.target.value })}
+        />
+      </label>
+      <label>
+        Size:
+        <select
+          value={updatedData.size || ""}
+          onChange={(e) => setUpdatedData({ ...updatedData, size: e.target.value })}
+        >
+          <option value="">Select size</option>
+          <option value="small">Small</option>
+          <option value="medium">Medium</option>
+          <option value="large">Large</option>
+        </select>
+      </label>
+      <label>
+        Category:
+        <select
+          value={updatedData.category || ""}
+          onChange={(e) => setUpdatedData({ ...updatedData, category: e.target.value })}
+        >
+          <option value="">Select category</option>
+          <option value="Sporting">Sporting</option>
+          <option value="Herding">Herding</option>
+          <option value="Non-Sporting">Non-Sporting</option>
+          <option value="Hound">Hound</option>
+          <option value="Working">Working</option>
+          <option value="Toy">Toy</option>
+        </select>
+      </label>
+      <fieldset>
+        <legend>Traits:</legend>
+        <label>
+          <input
+            type="checkbox"
+            checked={updatedData.traits?.includes("loyal") || false}
+            onChange={(e) => {
+              const newTraits = e.target.checked
+                ? [...(updatedData.traits || []), "loyal"]
+                : updatedData.traits.filter((trait) => trait !== "loyal");
+              setUpdatedData({ ...updatedData, traits: newTraits });
+            }}
+          />
+          Loyal
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={updatedData.traits?.includes("brave") || false}
+            onChange={(e) => {
+              const newTraits = e.target.checked
+                ? [...(updatedData.traits || []), "brave"]
+                : updatedData.traits.filter((trait) => trait !== "brave");
+              setUpdatedData({ ...updatedData, traits: newTraits });
+            }}
+          />
+          Brave
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={updatedData.traits?.includes("strong") || false}
+            onChange={(e) => {
+              const newTraits = e.target.checked
+                ? [...(updatedData.traits || []), "strong"]
+                : updatedData.traits.filter((trait) => trait !== "strong");
+              setUpdatedData({ ...updatedData, traits: newTraits });
+            }}
+          />
+          Strong
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={updatedData.traits?.includes("intelligent") || false}
+            onChange={(e) => {
+              const newTraits = e.target.checked
+                ? [...(updatedData.traits || []), "intelligent"]
+                : updatedData.traits.filter((trait) => trait !== "intelligent");
+              setUpdatedData({ ...updatedData, traits: newTraits });
+            }}
+          />
+          Intelligent
+        </label>
+      </fieldset>
+      <label>
+        Description:
+        <textarea
+          value={updatedData.description || ""}
+          onChange={(e) => setUpdatedData({ ...updatedData, description: e.target.value })}
+        />
+      </label>
+      <label>
+        Cost Range:
+        <input
+          type="text"
+          value={updatedData.cost_range || ""}
+          onChange={(e) => setUpdatedData({ ...updatedData, cost_range: e.target.value })}
+        />
+      </label>
+      <label>
+        Activity:
+        <input
+          type="text"
+          value={updatedData.activity || ""}
+          onChange={(e) => setUpdatedData({ ...updatedData, activity: e.target.value })}
+        />
+      </label>
+      <label>
+        Allergies:
+        <input
+          type="text"
+          value={updatedData.allergies || ""}
+          onChange={(e) => setUpdatedData({ ...updatedData, allergies: e.target.value })}
+        />
+      </label>
+      <label>
+        Age:
+        <input
+          type="text"
+          value={updatedData.age || ""}
+          onChange={(e) => setUpdatedData({ ...updatedData, age: e.target.value })}
+        />
+      </label>
       <button onClick={handleUpdate}>Submit</button>
       <button onClick={() => setEditPopup(false)}>Cancel</button>
     </div>
   </div>
 )}
+
 
       <div className="comments-section">
         <h2>Comments</h2>
