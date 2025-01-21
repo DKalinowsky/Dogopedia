@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ContentGrid.css";
+import axios from '../components/axiosConfig';
 
 const ContentGrid = () => {
   const [dogBreeds, setDogBreeds] = useState([]); // Wszystkie psy z backendu
@@ -25,23 +26,21 @@ const ContentGrid = () => {
   const navigate = useNavigate();
 
   // Pobranie danych z backendu
-  useEffect(() => {
-    const fetchDogs = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/dogs");
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        setDogBreeds(data); // Ustawiamy wszystkie psy
-        setFilteredDogs(data); // Domyślnie wszystkie psy są wyświetlane
-      } catch (err) {
-        console.error("Error fetching dog data:", err.message);
-      }
-    };
 
-    fetchDogs();
-  }, []);
+
+useEffect(() => {
+  const fetchDogs = async () => {
+    try {
+      const { data } = await axios.get('/dogs'); // Pobieranie z Axios
+      setDogBreeds(data);
+      setFilteredDogs(data);
+    } catch (err) {
+      console.error("Error fetching dog data:", err.message);
+    }
+  };
+
+  fetchDogs();
+}, []);
 
   // Obsługa filtrowania
   useEffect(() => {

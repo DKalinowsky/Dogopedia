@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from '../components/axiosConfig';
 import { useAuth } from "./AuthProvider"; // Kontekst autoryzacji
 import { useNavigate } from "react-router-dom"; // Import useNavigate do przekierowywania
 import { Link } from "react-router-dom"; // Import Link z react-router-dom
@@ -36,12 +36,12 @@ const Dashboard = () => {
     const fetchBreedAndFavorites = async () => {
       try {
         // Pobierz wszystkie psy
-        const response = await axios.get("http://localhost:5000/dogs");
+        const response = await axios.get("/dogs");
         const data = response.data;
 
         if (isLoggedIn) {
           // Pobierz id ulubionych psów
-          const likedResponse = await axios.get("http://localhost:5000/liked", {
+          const likedResponse = await axios.get("/liked", {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
