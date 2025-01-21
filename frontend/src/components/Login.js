@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../components/axiosConfig';
 import { toast, ToastContainer } from 'react-toastify'; // Import `toast` i `ToastContainer`
 import 'react-toastify/dist/ReactToastify.css'; // Import CSS dla `react-toastify`
 import "./Login.css";
@@ -46,7 +46,7 @@ const Login = () => {
     setServerError(null);
 
     try {
-      const response = await axios.post('http://localhost:5000/login', formData, {
+      const response = await axios.post('/login', formData, {
         headers: {
           'Content-Type': 'application/json',
         },

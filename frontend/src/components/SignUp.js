@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../components/axiosConfig';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './SignUp.css';
@@ -62,7 +62,7 @@ const SignUp = () => {
     setServerError(null);
 
     try {
-      const response = await axios.post('http://localhost:5000/register', {
+      const response = await axios.post('/register', {
         customer_nickname: formData.nickname,
         email_addr: formData.email,
         password: formData.password,

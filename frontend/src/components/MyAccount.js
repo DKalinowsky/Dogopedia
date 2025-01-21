@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "./AuthProvider";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import axios from '../components/axiosConfig';
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./MyAccount.css";
@@ -22,7 +22,7 @@ const MyAccount = ({ favoriteBreeds }) => {
     if (isLoggedIn) {
       const fetchUserData = async () => {
         try {
-          const response = await axios.get("http://localhost:5000/user/info", {
+          const response = await axios.get("/user/info", {
             params: { user_id: user.user_id },
           });
           setUserData(response.data);
@@ -50,7 +50,7 @@ const MyAccount = ({ favoriteBreeds }) => {
 
   const handleUpdateUser = async () => {
     try {
-      const response = await axios.put("http://localhost:5000/user", {
+      const response = await axios.put("/user", {
         customer_nickname: formData.customer_nickname,
         email_addr: formData.email_addr,
       });
@@ -68,7 +68,7 @@ const MyAccount = ({ favoriteBreeds }) => {
     }
 
     try {
-      const response = await axios.put("http://localhost:5000/user/update-password", {
+      const response = await axios.put("/user/update-password", {
         current_password: formData.current_password,
         new_password: formData.new_password,
       });
@@ -88,7 +88,7 @@ const MyAccount = ({ favoriteBreeds }) => {
   const handleDeleteAccount = async () => {
     if (window.confirm("Are you sure you want to delete your account? This action is irreversible.")) {
       try {
-        const response = await axios.delete("http://localhost:5000/user");
+        const response = await axios.delete("/user");
         toast.success(response.data.message);
         logout();
       } catch (err) {

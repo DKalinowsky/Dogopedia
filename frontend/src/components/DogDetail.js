@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import axios from '../components/axiosConfig';
 import { toast, ToastContainer } from "react-toastify"; // Import `toast` i `ToastContainer`
 import "react-toastify/dist/ReactToastify.css"; // Import CSS dla `react-toastify`
 import "./DogDetail.css";
@@ -25,7 +25,7 @@ const DogDetail = () => {
     const fetchBreedAndFavorites = async () => {
       try {
         // Pobierz szczegóły psa
-        const response = await axios.get("http://localhost:5000/dogs");
+        const response = await axios.get("/dogs");
         const data = response.data;
 
         // Znajdź psa na podstawie dog_id
@@ -43,13 +43,13 @@ const DogDetail = () => {
         setBreed(foundBreed);
 
         // Sprawdź, czy pies jest w ulubionych
-        const favoritesResponse = await axios.get("http://localhost:5000/liked");
+        const favoritesResponse = await axios.get("/liked");
         const favoriteDogs = favoritesResponse.data;
 
         // Jeśli `dogId` jest na liście ulubionych, ustaw `isFavorite` na true
         const isFavoriteDog = favoriteDogs.some((favorite) => favorite.dog_id === foundBreed.dog_id);
         setIsFavorite(isFavoriteDog);
-        const commentsResponse = await axios.get(`http://localhost:5000/dogs/${dogId}/comments`);
+        const commentsResponse = await axios.get(`/dogs/${dogId}/comments`);
         setComments({
           forum: commentsResponse.data.filter((c) => c.comm_type === "forum"),
           care: commentsResponse.data.filter((c) => c.comm_type === "care"),
@@ -67,7 +67,7 @@ const DogDetail = () => {
 
 const handleUpdateComment = async (commId) => {
   try {
-    await axios.put(`http://localhost:5000/comments/${commId}`, {
+    await axios.put(`/comments/${commId}`, {
       comm_text: newComment,
     });
 
@@ -90,7 +90,7 @@ const handleEditComment = (commId, currentText) => {
   
   const handleDeleteComment = async (commId) => {
     try {
-      await axios.delete(`http://localhost:5000/comments/${commId}`);
+      await axios.delete(`/comments/${commId}`);
       setComments((prevComments) => ({
         ...prevComments,
         [activeTab]: prevComments[activeTab].filter((comment) => comment.comm_id !== commId),
@@ -106,14 +106,14 @@ const handleEditComment = (commId, currentText) => {
     try {
       if (isFavorite) {
         // Usuń z ulubionych
-        await axios.delete("http://localhost:5000/user/favorites/remove", {
+        await axios.delete("/user/favorites/remove", {
           data: { dog_id: breed.dog_id }, // Poprawka tutaj
         });
         setIsFavorite(false);
         toast.success(`${breed.race} has been removed from your favorites!`); // Powiadomienie o usunięciu
       } else {
         // Dodaj do ulubionych
-        await axios.post("http://localhost:5000/user/favorites/add", {
+        await axios.post("/user/favorites/add", {
           dog_id: breed.dog_id,
         });
         setIsFavorite(true);
@@ -127,7 +127,7 @@ const handleEditComment = (commId, currentText) => {
 
   const fetchComments = async () => {
   try {
-    const commentsResponse = await axios.get(`http://localhost:5000/dogs/${dogId}/comments`);
+    const commentsResponse = await axios.get(`/dogs/${dogId}/comments`);
     setComments({
       forum: commentsResponse.data.filter((c) => c.comm_type === "forum"),
       care: commentsResponse.data.filter((c) => c.comm_type === "care"),
@@ -140,7 +140,7 @@ const handleEditComment = (commId, currentText) => {
 
   const handleAddComment = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/comments", {
+      const response = await axios.post("/comments", {
         dog_id: parseInt(dogId),
         comm_text: newComment,
         comm_type: activeTab,
@@ -188,7 +188,7 @@ const handleUpdate = async () => {
     };
 
     // Wysyłamy dane na endpoint request-update
-    const response = await axios.post(`http://localhost:5000/dog/request-update/${dogId}`, dataToSend);
+    const response = await axios.post(`/dog/request-update/${dogId}`, dataToSend);
 
     toast.success("Dog information update request submitted successfully!");
     setEditPopup(false);

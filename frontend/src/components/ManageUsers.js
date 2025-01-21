@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from '../components/axiosConfig';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./ManageUsers.css";
@@ -17,9 +17,9 @@ const ManageUsers = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const usersResponse = await axios.get("http://localhost:5000/user");
-        const dogsResponse = await axios.get("http://localhost:5000/dogs");
-        const awaitingResponse = await axios.get("http://localhost:5000/awaiting");
+        const usersResponse = await axios.get("/user");
+        const dogsResponse = await axios.get("/dogs");
+        const awaitingResponse = await axios.get("/awaiting");
 
         setUsers(usersResponse.data);
         setDogs(dogsResponse.data);
@@ -40,7 +40,7 @@ const ManageUsers = () => {
   const handleBanUser = async (userId) => {
      try {
       const response = await axios.patch(
-        `http://localhost:5000/user/${userId}/ban`
+        `/user/${userId}/ban`
       );
       if (response.status === 200) {
         setUsers((prevUsers) =>
@@ -60,7 +60,7 @@ const ManageUsers = () => {
   const handleUnbanUser = async (userId) => {
      try {
       const response = await axios.patch(
-        `http://localhost:5000/user/${userId}/unban`
+        `/user/${userId}/unban`
       );
       if (response.status === 200) {
         setUsers((prevUsers) =>
@@ -79,7 +79,7 @@ const ManageUsers = () => {
 
   const handleDeleteUser = async (userId) => {
      try {
-      const response = await axios.delete(`http://localhost:5000/user/${userId}`);
+      const response = await axios.delete(`/user/${userId}`);
       if (response.status === 200) {
         setUsers((prevUsers) => prevUsers.filter((user) => user.user_id !== userId));
         toast.error(`User ${userId} has been deleted.`);
@@ -93,7 +93,7 @@ const ManageUsers = () => {
 
   const handleDeleteBreed = async (dogId) => {
     try {
-      await axios.delete(`http://localhost:5000/dogs/${dogId}`);
+      await axios.delete(`/dogs/${dogId}`);
       setDogBreeds(dogBreeds.filter(dog => dog.dog_id !== dogId));
       setFilteredDogs(filteredDogs.filter(dog => dog.dog_id !== dogId));
       toast.success("Breed deleted successfully!");
@@ -114,11 +114,11 @@ const ManageUsers = () => {
   const handleApproveRequest = async (requestId, dogId, requestData) => {
     try {
       // Update dog breed with all the new data from the request
-      const response = await axios.put(`http://localhost:5000/dog/${dogId}`, requestData);
+      const response = await axios.put(`/dog/${dogId}`, requestData);
 
       if (response.status === 200) {
         // Successfully updated breed, now delete the request
-        await axios.delete(`http://localhost:5000/awaiting/${requestId}`);
+        await axios.delete(`/awaiting/${requestId}`);
         setAwaitingRequests(awaitingRequests.filter(req => req.request_id !== requestId));
         toast.success("Request approved and breed updated.");
       }
@@ -131,7 +131,7 @@ const ManageUsers = () => {
 
   const handleDeleteRequest = async (requestId) => {
     try {
-      await axios.delete(`http://localhost:5000/awaiting/${requestId}`);
+      await axios.delete(`/awaiting/${requestId}`);
       setAwaitingRequests(awaitingRequests.filter(req => req.request_id !== requestId));
       toast.success("Request deleted successfully!");
     } catch (err) {
